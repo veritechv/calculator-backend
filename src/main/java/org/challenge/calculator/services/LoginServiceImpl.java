@@ -9,6 +9,7 @@ import org.challenge.calculator.security.jwt.JwtProvider;
 import org.challenge.calculator.webmodel.Token;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,7 +24,6 @@ import java.util.Optional;
 public class LoginServiceImpl implements LoginService{
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginServiceImpl.class);
 
-    private UserRepository userRepository;
     private AuthenticationManager authenticationManager;
     private JwtProvider jwtProvider;
     private PasswordEncoder passwordEncoder;
@@ -32,9 +32,9 @@ public class LoginServiceImpl implements LoginService{
     @Value("${secretPsw}")
     private String secretPsw;
 
-    public LoginServiceImpl(UserRepository userRepository, AuthenticationManager authenticationManager,
+    @Autowired
+    public LoginServiceImpl(AuthenticationManager authenticationManager,
                             JwtProvider jwtProvider, PasswordEncoder passwordEncoder, UserServiceImpl userService) {
-        this.userRepository = userRepository;
         this.authenticationManager = authenticationManager;
         this.jwtProvider = jwtProvider;
         this.passwordEncoder = passwordEncoder;
@@ -46,9 +46,8 @@ public class LoginServiceImpl implements LoginService{
         if (StringUtils.isNoneBlank(username, password)) {
             Optional<User> existingUser = userService.searchUser(username);
             if (existingUser.isPresent()) {
-                String encryptedPassword = passwordEncoder.encode(password);
-                if (encryptedPassword.equals(existingUser.get().getPassword())) {
-                    token = generateSecurityToken(existingUser.get());
+                if (passwordEncoder.matches(password, existingUser.get().getPassword())) {
+                    token = generateSecurityToken(existingUser.get(), password);
                 } else {
                     LOGGER.error("Username and/or password incorrect");
                 }
@@ -73,9 +72,9 @@ public class LoginServiceImpl implements LoginService{
         return newUser;
     }
 
-    private Token generateSecurityToken(User user){
+    private Token generateSecurityToken(User user, String password){
         Authentication authentication =
-                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), secretPsw));
+                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), password));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwtToken = jwtProvider.generateToken(authentication);
         Token token = new Token();

@@ -22,13 +22,13 @@ public class Record {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User caller;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name="cost")
     private long executionCost;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name="balance")
     private long remainingBalance;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name="response")
     private String serviceResponse;
 
     @Column(nullable = false)
@@ -44,6 +44,70 @@ public class Record {
         this.executionCost = executionCost;
         this.remainingBalance = remainingBalance;
         this.serviceResponse = serviceResponse;
+        this.executionDate = executionDate;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    public Service getServiceExecuted() {
+        return serviceExecuted;
+    }
+
+    public void setServiceExecuted(Service serviceExecuted) {
+        this.serviceExecuted = serviceExecuted;
+    }
+
+    public User getCaller() {
+        return caller;
+    }
+
+    public void setCaller(User caller) {
+        this.caller = caller;
+    }
+
+    public long getExecutionCost() {
+        return executionCost;
+    }
+
+    public void setExecutionCost(long executionCost) {
+        this.executionCost = executionCost;
+    }
+
+    public long getRemainingBalance() {
+        return remainingBalance;
+    }
+
+    public void setRemainingBalance(long remainingBalance) {
+        this.remainingBalance = remainingBalance;
+    }
+
+    public String getServiceResponse() {
+        return serviceResponse;
+    }
+
+    public void setServiceResponse(String serviceResponse) {
+        this.serviceResponse = serviceResponse;
+    }
+
+    public Date getExecutionDate() {
+        return executionDate;
+    }
+
+    public void setExecutionDate(Date executionDate) {
         this.executionDate = executionDate;
     }
 }

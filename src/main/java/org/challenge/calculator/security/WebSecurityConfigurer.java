@@ -30,7 +30,7 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
 
     @Bean
-    JwtTokenFilter jwtTokenFilter(){
+    JwtTokenFilter jwtTokenFilter() {
         return new JwtTokenFilter();
     }
 

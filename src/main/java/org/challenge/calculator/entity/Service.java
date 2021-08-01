@@ -20,7 +20,7 @@ public class Service {
     private ServiceName serviceName;
 
     @Enumerated(EnumType.STRING)
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false, name = "status")
     private ServiceStatusName serviceStatusName;
 
     @Column(columnDefinition = "numeric default 0")

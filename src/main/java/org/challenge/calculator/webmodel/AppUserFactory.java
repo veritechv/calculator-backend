@@ -1,6 +1,7 @@
 package org.challenge.calculator.webmodel;
 
 import org.challenge.calculator.entity.User;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,5 +18,13 @@ public class AppUserFactory {
                     user.getStatus().name());
         }
         return appUser;
+    }
+
+    static public Page<AppUser> buildFromPageUser(Page<User> pageToTransform){
+        Page<AppUser> transformedPage = null;
+        if(pageToTransform!=null){
+            transformedPage = pageToTransform.map(AppUserFactory::buildFromUser);
+        }
+        return transformedPage;
     }
 }

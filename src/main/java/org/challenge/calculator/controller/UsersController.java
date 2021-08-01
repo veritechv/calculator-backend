@@ -2,6 +2,8 @@ package org.challenge.calculator.controller;
 
 import org.challenge.calculator.entity.User;
 import org.challenge.calculator.services.UserService;
+import org.challenge.calculator.webmodel.AppUser;
+import org.challenge.calculator.webmodel.AppUserFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -29,19 +30,8 @@ public class UsersController {
     }
 
     @GetMapping("/listUsers")
-    public Page listUsersPageable(Pageable pageable){
-        return userService.listUsers(pageable);
-    }
-
-    @GetMapping("/list")
-    public ResponseEntity<List<User>> listUsers(){
-        List<User> users = userService.listUsers();
-        if(users==null || users.isEmpty()){
-            LOGGER.info("No users registered in the app yet.");
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }else{
-            return new ResponseEntity<>(users, HttpStatus.OK);
-        }
+    public Page<AppUser> listUsersPageable(Pageable pageable){
+         return AppUserFactory.buildFromPageUser(userService.listUsers(pageable));
     }
 
     @GetMapping("/search")
