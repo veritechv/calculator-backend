@@ -3,6 +3,7 @@ package org.challenge.calculator.services;
 import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
+import org.challenge.calculator.exception.CalculatorOperationException;
 import org.challenge.calculator.utils.ServiceUsageCalculator;
 import org.challenge.calculator.entity.User;
 import org.challenge.calculator.model.ServiceRequest;
@@ -23,7 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Service("randomStringService")
-public class RandomStringServiceImpl implements CalculatorService{
+public class RandomStringServiceImpl extends  CalculatorService{
     private static final String RANDOM_GENERATOR_URL = "https://www.random.org/strings/?num=1&len=10&digits=on&upperalpha=on&loweralpha=on&unique=on&format=plain&rnd=new";
     private static final Logger LOGGER = LoggerFactory.getLogger(RandomStringServiceImpl.class);
 
@@ -32,7 +33,7 @@ public class RandomStringServiceImpl implements CalculatorService{
     public ServiceResponse execute(ServiceRequest serviceRequest) {
         ServiceResponse serviceResponse = null;
 
-        if(serviceRequest!=null && StringUtils.isNoneBlank(serviceRequest.getServiceUUID(), serviceRequest.getUsername())){
+        if(isRequestValid(serviceRequest)){
             String randomString = getRandomStringFromThirdParty(RANDOM_GENERATOR_URL, null);
             serviceResponse = new ServiceResponse();
             serviceResponse.setServiceUUID(serviceRequest.getServiceUUID());
@@ -42,6 +43,7 @@ public class RandomStringServiceImpl implements CalculatorService{
 
         }else{
             LOGGER.error("Some of the parameters are incorrect. Please check");
+            throw new CalculatorOperationException("Some of the parameters are incorrect. Please check");
         }
 
         return serviceResponse;

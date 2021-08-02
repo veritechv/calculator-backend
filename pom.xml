@@ -16,6 +16,11 @@
 	<description>Code Challenge</description>
 	<properties>
 		<java.version>11</java.version>
+		<flyway.version>7.12.0</flyway.version>
+		<flyway.user>postgres</flyway.user>
+		<flyway.password></flyway.password>
+		<flyway.schemas>settings</flyway.schemas>
+		<flyway.url>jdbc:postgresql://localhost:5432/code_challenge</flyway.url>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -100,11 +105,38 @@
 			<version>4.5.13</version>
 		</dependency>
 
-		<!--database drivers-->
+		<!--database -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.flywaydb/flyway-core -->
+		<!--
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+			<version>${flyway.version}</version>
+		</dependency>
+		-->
+
+		<!-- https://mvnrepository.com/artifact/org.flywaydb/flyway-maven-plugin -->
+		<!--
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-maven-plugin</artifactId>
+			<version>${flyway.version}</version>
+		</dependency>
+		-->
+
+		<!-- Math operation evaluator -->
+
+		<dependency>
+			<groupId>com.fathzer</groupId>
+			<artifactId>javaluator</artifactId>
+			<version>3.0.3</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -113,7 +145,21 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+        <!--
+			<plugin>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-maven-plugin</artifactId>
+				<version>${flyway.version}</version>
+				<configuration>
+					<user>${flyway.user}</user>
+					<password>${flyway.password}</password>
+					<url>${flyway.url}</url>
+					<schemas>
+						<schema>${flyway.schemas}</schema>
+					</schemas>
+				</configuration>
+			</plugin>
+	    -->
 		</plugins>
 	</build>
-
 </project>
