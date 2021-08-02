@@ -3,7 +3,7 @@ package org.challenge.calculator.controller;
 import org.challenge.calculator.entity.User;
 import org.challenge.calculator.exception.UserAlreadyExistsException;
 import org.challenge.calculator.services.LoginService;
-import org.challenge.calculator.webmodel.Token;
+import org.challenge.calculator.model.Token;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

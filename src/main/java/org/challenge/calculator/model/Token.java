@@ -1,4 +1,4 @@
-package org.challenge.calculator.webmodel;
+package org.challenge.calculator.model;
 
 public class Token {
     private String value;

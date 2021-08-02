@@ -1,26 +1,25 @@
-package org.challenge.calculator.webmodel;
+package org.challenge.calculator.model;
 
 public class AppService {
-    private long id;
+    private String uuid;
     private String name;
     private String status;
     private long cost;
 
 
-    public AppService(long id, String name, String status, long cost) {
-        this.id = id;
+    public AppService(String uuid, String name, String status, long cost) {
+        this.uuid = uuid;
         this.name = name;
         this.status = status;
         this.cost = cost;
     }
 
-
-    public long getId() {
-        return id;
+    public String getUuid() {
+        return uuid;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public String getName() {

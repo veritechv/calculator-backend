@@ -1,28 +1,18 @@
-package org.challenge.calculator.webmodel;
+package org.challenge.calculator.model;
 
 import java.util.List;
 
 public class AppUser {
-    private long id;
     private String username;
     private List<String> roles;
     private long balance;
     private String status;
 
-    public AppUser(long id, String username, List<String> roles, long balance, String status) {
-        this.id = id;
+    public AppUser(String username, List<String> roles, long balance, String status) {
         this.username = username;
         this.roles = roles;
         this.balance = balance;
         this.status = status;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public String getUsername() {

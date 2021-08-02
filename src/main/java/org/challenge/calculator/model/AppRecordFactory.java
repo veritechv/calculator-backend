@@ -1,4 +1,4 @@
-package org.challenge.calculator.webmodel;
+package org.challenge.calculator.model;
 
 import org.challenge.calculator.entity.Record;
 import org.springframework.data.domain.Page;
@@ -11,7 +11,7 @@ public class AppRecordFactory {
             String caller = record.getCaller()!=null ? record.getCaller().getUsername():null;
             long executionDate = record.getExecutionDate()!=null?record.getExecutionDate().getTime():0L;
 
-            appRecord = new AppRecord(record.getId(), serviceNameExecuted, caller, record.getExecutionCost(),
+            appRecord = new AppRecord(record.getUuid(), serviceNameExecuted, caller, record.getExecutionCost(),
                     record.getRemainingBalance(), record.getServiceResponse(), executionDate);
         }
 

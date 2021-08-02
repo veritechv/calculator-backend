@@ -1,7 +1,7 @@
-package org.challenge.calculator.webmodel;
+package org.challenge.calculator.model;
 
 public class AppRecord {
-    private long id;
+    private String uuid;
     private String serviceName;
     private String userName;
     private long executionCost;
@@ -9,9 +9,8 @@ public class AppRecord {
     private String response;
     private long executionDate;
 
-    public AppRecord(long id, String serviceName, String userName, long executionCost,
-                     long remainingBalance, String response, long executionDate) {
-        this.id = id;
+    public AppRecord(String uuid, String serviceName, String userName, long executionCost, long remainingBalance, String response, long executionDate) {
+        this.uuid = uuid;
         this.serviceName = serviceName;
         this.userName = userName;
         this.executionCost = executionCost;
@@ -20,12 +19,12 @@ public class AppRecord {
         this.executionDate = executionDate;
     }
 
-    public long getId() {
-        return id;
+    public String getUuid() {
+        return uuid;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public String getServiceName() {

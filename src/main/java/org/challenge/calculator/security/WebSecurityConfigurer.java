@@ -1,10 +1,13 @@
 package org.challenge.calculator.security;
 
+import org.challenge.calculator.interceptor.ServiceRequestInterceptor;
 import org.challenge.calculator.security.jwt.JwtEntryPoint;
 import org.challenge.calculator.security.jwt.JwtTokenFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -27,7 +30,6 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
     @Autowired
     JwtEntryPoint jwtEntryPoint;
-
 
     @Bean
     JwtTokenFilter jwtTokenFilter() {

@@ -2,7 +2,7 @@ package org.challenge.calculator.services;
 
 import org.challenge.calculator.entity.User;
 import org.challenge.calculator.exception.UserAlreadyExistsException;
-import org.challenge.calculator.webmodel.Token;
+import org.challenge.calculator.model.Token;
 
 public interface LoginService {
     Token loginUser(String username, String password);

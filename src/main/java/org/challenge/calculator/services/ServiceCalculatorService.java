@@ -4,6 +4,9 @@ import org.challenge.calculator.entity.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-public interface CalculatorServiceService {
+import java.util.Optional;
+
+public interface ServiceCalculatorService {
     Page<Service> listServices(Pageable pagingInformation);
+    Optional<Service> searchServiceByUuid(String Uuid);
 }

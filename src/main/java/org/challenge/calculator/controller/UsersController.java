@@ -2,8 +2,8 @@ package org.challenge.calculator.controller;
 
 import org.challenge.calculator.entity.User;
 import org.challenge.calculator.services.UserService;
-import org.challenge.calculator.webmodel.AppUser;
-import org.challenge.calculator.webmodel.AppUserFactory;
+import org.challenge.calculator.model.AppUser;
+import org.challenge.calculator.model.AppUserFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
