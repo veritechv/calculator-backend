@@ -20,4 +20,9 @@ public class RecordServiceImpl implements RecordService{
     public Page<Record> listRecords(Pageable pagingInformation) {
         return recordRepository.findAll(pagingInformation);
     }
+
+    @Override
+    public Record createRecord(Record newRecord) {
+        return recordRepository.save(newRecord);
+    }
 }

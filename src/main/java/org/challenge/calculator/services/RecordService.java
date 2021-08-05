@@ -7,5 +7,6 @@ import org.springframework.data.domain.Pageable;
 public interface RecordService {
 
     Page<Record> listRecords(Pageable pagingInformation);
+    Record createRecord(Record newRecord);
 
 }

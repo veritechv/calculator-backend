@@ -1,21 +1,21 @@
 package org.challenge.calculator.controller;
 
+import org.apache.commons.lang3.StringUtils;
 import org.challenge.calculator.entity.User;
 import org.challenge.calculator.exception.UserAlreadyExistsException;
-import org.challenge.calculator.services.LoginService;
 import org.challenge.calculator.model.Token;
+import org.challenge.calculator.model.UserCredentials;
+import org.challenge.calculator.services.LoginService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/login")
+@CrossOrigin
 public class LoginController {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginController.class);
 
@@ -26,15 +26,16 @@ public class LoginController {
         this.loginService = loginService;
     }
 
-    @PostMapping(value="/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public ResponseEntity<Token> login(@RequestBody MultiValueMap<String, String> formData){
+    @PostMapping(value="/authenticate")
+    public ResponseEntity<Token> login(@RequestBody UserCredentials userCredentials){
         ResponseEntity<Token> responseEntity;
         Token token = null;
 
-        if(formData!=null && !formData.isEmpty()) {
-            String userName = formData.getFirst("username");
-            String password = formData.getFirst("password");
-            token = loginService.loginUser(userName, password);
+        if(userCredentials!=null &&
+                StringUtils.isNoneBlank(userCredentials.getUsername(), userCredentials.getPassword())) {
+            String username = userCredentials.getUsername();
+            String password = userCredentials.getPassword();
+            token = loginService.loginUser(username, password);
         }
 
         responseEntity = token == null ?
@@ -44,16 +45,17 @@ public class LoginController {
         return responseEntity;
     }
 
-    @PostMapping(value="/register", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public ResponseEntity<String> register(@RequestBody MultiValueMap<String, String> formData){
+    @PostMapping(value="/register")
+    public ResponseEntity<String> register(@RequestBody UserCredentials userCredentials){
         ResponseEntity<String> response = null;
-        if(formData!=null && !formData.isEmpty()) {
-            String username = formData.getFirst("username");
-            String password = formData.getFirst("password");
+        if(userCredentials!=null &&
+                StringUtils.isNoneBlank(userCredentials.getUsername(), userCredentials.getPassword())) {
+            String username = userCredentials.getUsername();
+            String password = userCredentials.getPassword();
             try {
                 User newUser = loginService.registerUser(username, password);
                 if(newUser!=null){
-                    response = new ResponseEntity<>("User registration successful", HttpStatus.OK);
+                    response = new ResponseEntity<>(buildJsonSimpleResponse("User registration successful"), HttpStatus.OK);
                 }
             }catch(UserAlreadyExistsException exception){
                 response = new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
@@ -61,10 +63,14 @@ public class LoginController {
         }
 
         response = response == null ?
-                new ResponseEntity<>("Username/Password incorrect", HttpStatus.BAD_REQUEST) :
+                new ResponseEntity<>(buildJsonSimpleResponse("Username/Password incorrect"), HttpStatus.BAD_REQUEST) :
                 response;
 
         return response;
+    }
+
+    private String buildJsonSimpleResponse(String response){
+        return "{\"response\":\""+response+"\"}";
     }
 
 }

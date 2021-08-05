@@ -1,5 +1,6 @@
 package org.challenge.calculator.entity;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.challenge.calculator.enums.UserStatusName;
 
 import javax.persistence.*;
@@ -28,7 +29,7 @@ public class User {
     private Set<Role> roles;
 
     @Enumerated(EnumType.STRING)
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private UserStatusName status;
 
     @Column(nullable=false)
@@ -101,5 +102,9 @@ public class User {
 
     public void setBalance(long balance) {
         this.balance = balance;
+    }
+
+    public boolean isActive(){
+        return getStatus() != null && getStatus() == UserStatusName.ACTIVE;
     }
 }

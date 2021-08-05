@@ -4,12 +4,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.challenge.calculator.entity.User;
 import org.challenge.calculator.exception.UserAlreadyExistsException;
-import org.challenge.calculator.security.jwt.JwtProvider;
 import org.challenge.calculator.model.Token;
+import org.challenge.calculator.security.jwt.JwtProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -28,9 +27,6 @@ public class LoginServiceImpl implements LoginService{
     private PasswordEncoder passwordEncoder;
     private UserServiceImpl userService;
 
-    @Value("${secretPsw}")
-    private String secretPsw;
-
     @Autowired
     public LoginServiceImpl(AuthenticationManager authenticationManager,
                             JwtProvider jwtProvider, PasswordEncoder passwordEncoder, UserServiceImpl userService) {
@@ -45,7 +41,8 @@ public class LoginServiceImpl implements LoginService{
         if (StringUtils.isNoneBlank(username, password)) {
             Optional<User> existingUser = userService.searchUser(username);
             if (existingUser.isPresent()) {
-                if (passwordEncoder.matches(password, existingUser.get().getPassword())) {
+                if (existingUser.get().isActive() &&
+                        passwordEncoder.matches(password, existingUser.get().getPassword())) {
                     token = generateSecurityToken(existingUser.get(), password);
                 } else {
                     LOGGER.error("Username and/or password incorrect");

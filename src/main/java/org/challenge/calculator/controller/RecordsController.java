@@ -6,10 +6,14 @@ import org.challenge.calculator.model.AppRecordFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/records")
+@CrossOrigin
 public class RecordsController {
 
     private RecordService recordService;
@@ -19,7 +23,7 @@ public class RecordsController {
         this.recordService = recordService;
     }
 
-    @GetMapping("/records/list")
+    @GetMapping("/list")
     public Page<AppRecord> listRecords(Pageable pagingInformation){
         return AppRecordFactory.buildFromPageRecord(recordService.listRecords(pagingInformation));
     }
