@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping
 @CrossOrigin
 public class UsersController {
     private static final Logger LOGGER = LoggerFactory.getLogger(UsersController.class);
@@ -27,13 +27,13 @@ public class UsersController {
         this.userService = userService;
     }
 
-    @GetMapping("/list")
+    @GetMapping("/users")
     public Page<AppUser> listUsersPageable(Pageable pageable){
         return AppUserFactory.buildFromPageUser(userService.listUsers(pageable));
     }
 
-    @GetMapping(value="/search")
-    public ResponseEntity<AppUser> searchUser(@RequestParam String username) {
+    @GetMapping(value="/users/{username}")
+    public ResponseEntity<AppUser> searchUser(@PathVariable String username) {
         Optional<User> userOptional = userService.searchUser(username);
         if (userOptional.isEmpty()) {
             LOGGER.info("User [" + username + "] NOT FOUND");
@@ -43,8 +43,8 @@ public class UsersController {
         }
     }
 
-    @GetMapping("/search2")
-    public ResponseEntity<AppUser> searchUser(@RequestParam int userId) {
+   /* @GetMapping("/search/{id}")
+    public ResponseEntity<AppUser> searchUser(@PathVariable int userId) {
         Optional<User> userOptional = userService.searchUser(userId);
         if (userOptional.isEmpty()) {
             LOGGER.info("User with ID[" + userId + "] NOT FOUND");
@@ -52,5 +52,5 @@ public class UsersController {
         } else {
             return new ResponseEntity<>(AppUserFactory.buildFromUser(userOptional.get()), HttpStatus.OK);
         }
-    }
+    }*/
 }

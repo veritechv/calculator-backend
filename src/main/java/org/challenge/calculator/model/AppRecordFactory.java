@@ -7,12 +7,12 @@ public class AppRecordFactory {
     public static AppRecord buildFromRecord(Record record){
         AppRecord appRecord = null;
         if(record!=null){
-            String serviceNameExecuted = record.getServiceExecuted()!=null?record.getServiceExecuted().getServiceName().name():null;
-            String caller = record.getCaller()!=null ? record.getCaller().getUsername():null;
+            String serviceNameExecuted = record.getService()!=null?record.getService().getName().name():null;
+            String caller = record.getUser()!=null ? record.getUser().getUsername():null;
             long executionDate = record.getExecutionDate()!=null?record.getExecutionDate().getTime():0L;
 
-            appRecord = new AppRecord(record.getUuid(), serviceNameExecuted, caller, record.getExecutionCost(),
-                    record.getRemainingBalance(), record.getServiceResponse(), executionDate);
+            appRecord = new AppRecord(record.getUuid(), serviceNameExecuted, caller, record.getCost(),
+                    record.getBalance(), record.getResponse(), executionDate);
         }
 
         return appRecord;

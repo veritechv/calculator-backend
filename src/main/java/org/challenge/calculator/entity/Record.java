@@ -16,20 +16,20 @@ public class Record {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "service_id", referencedColumnName = "id")
-    private Service serviceExecuted;
+    private Service service;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private User caller;
+    private User user;
 
     @Column(nullable = false, name="cost")
-    private long executionCost;
+    private long cost;
 
     @Column(nullable = false, name="balance")
-    private long remainingBalance;
+    private long balance;
 
     @Column(nullable = false, name="response")
-    private String serviceResponse;
+    private String response;
 
     @Column(nullable = false)
     private Date executionDate;
@@ -39,11 +39,11 @@ public class Record {
     }
 
     public Record(Service serviceExecuted, User caller, long executionCost, long remainingBalance, String serviceResponse, Date executionDate) {
-        this.serviceExecuted = serviceExecuted;
-        this.caller = caller;
-        this.executionCost = executionCost;
-        this.remainingBalance = remainingBalance;
-        this.serviceResponse = serviceResponse;
+        this.service = serviceExecuted;
+        this.user = caller;
+        this.cost = executionCost;
+        this.balance = remainingBalance;
+        this.response = serviceResponse;
         this.executionDate = executionDate;
     }
 
@@ -63,44 +63,44 @@ public class Record {
         this.uuid = uuid;
     }
 
-    public Service getServiceExecuted() {
-        return serviceExecuted;
+    public Service getService() {
+        return service;
     }
 
-    public void setServiceExecuted(Service serviceExecuted) {
-        this.serviceExecuted = serviceExecuted;
+    public void setService(Service serviceExecuted) {
+        this.service = serviceExecuted;
     }
 
-    public User getCaller() {
-        return caller;
+    public User getUser() {
+        return user;
     }
 
-    public void setCaller(User caller) {
-        this.caller = caller;
+    public void setUser(User caller) {
+        this.user = caller;
     }
 
-    public long getExecutionCost() {
-        return executionCost;
+    public long getCost() {
+        return cost;
     }
 
-    public void setExecutionCost(long executionCost) {
-        this.executionCost = executionCost;
+    public void setCost(long executionCost) {
+        this.cost = executionCost;
     }
 
-    public long getRemainingBalance() {
-        return remainingBalance;
+    public long getBalance() {
+        return balance;
     }
 
-    public void setRemainingBalance(long remainingBalance) {
-        this.remainingBalance = remainingBalance;
+    public void setBalance(long remainingBalance) {
+        this.balance = remainingBalance;
     }
 
-    public String getServiceResponse() {
-        return serviceResponse;
+    public String getResponse() {
+        return response;
     }
 
-    public void setServiceResponse(String serviceResponse) {
-        this.serviceResponse = serviceResponse;
+    public void setResponse(String serviceResponse) {
+        this.response = serviceResponse;
     }
 
     public Date getExecutionDate() {

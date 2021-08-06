@@ -17,11 +17,11 @@ public class Service {
 
     @Enumerated(EnumType.STRING)
     @Column(unique = true, nullable = false)
-    private ServiceName serviceName;
+    private ServiceName name;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, name = "status")
-    private ServiceStatusName serviceStatusName;
+    @Column(nullable = false)
+    private ServiceStatusName status;
 
     @Column(columnDefinition = "numeric default 0")
     private long cost;
@@ -34,8 +34,8 @@ public class Service {
     public Service(String uuid, ServiceName serviceName, ServiceStatusName serviceStatusName, long cost) {
         super();
         this.uuid = uuid;
-        this.serviceName = serviceName;
-        this.serviceStatusName = serviceStatusName;
+        this.name = serviceName;
+        this.status = serviceStatusName;
         this.cost = cost;
     }
 
@@ -55,20 +55,20 @@ public class Service {
         this.uuid = uuid;
     }
 
-    public ServiceName getServiceName() {
-        return serviceName;
+    public ServiceName getName() {
+        return name;
     }
 
-    public void setServiceName(ServiceName serviceName) {
-        this.serviceName = serviceName;
+    public void setName(ServiceName serviceName) {
+        this.name = serviceName;
     }
 
-    public ServiceStatusName getServiceStatusName() {
-        return serviceStatusName;
+    public ServiceStatusName getStatus() {
+        return status;
     }
 
-    public void setServiceStatusName(ServiceStatusName serviceStatusName) {
-        this.serviceStatusName = serviceStatusName;
+    public void setStatus(ServiceStatusName serviceStatusName) {
+        this.status = serviceStatusName;
     }
 
     public long getCost() {

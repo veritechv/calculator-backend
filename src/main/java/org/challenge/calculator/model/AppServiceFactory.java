@@ -8,8 +8,8 @@ public class AppServiceFactory {
     public static AppService buildFromService(Service service){
         AppService appService = null;
         if(service!=null){
-            appService = new AppService(service.getUuid(), service.getServiceName().name(),
-                    service.getServiceStatusName().name(), service.getCost());
+            appService = new AppService(service.getUuid(), service.getName().name(),
+                    service.getStatus().name(), service.getCost());
         }
 
         return appService;
