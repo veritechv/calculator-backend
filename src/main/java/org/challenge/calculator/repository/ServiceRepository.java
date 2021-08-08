@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface ServiceRepository extends PagingAndSortingRepository<Service, Integer> {
     Optional<Service> findByUuid(String uuid);
+    Optional<Service> findByName(String name);
 }

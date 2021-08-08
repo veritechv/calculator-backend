@@ -3,7 +3,7 @@ package org.challenge.calculator.services;
 import org.challenge.calculator.entity.Role;
 import org.challenge.calculator.entity.User;
 import org.challenge.calculator.enums.RoleName;
-import org.challenge.calculator.enums.UserStatusName;
+import org.challenge.calculator.enums.UserStatus;
 import org.challenge.calculator.repository.RoleRepository;
 import org.challenge.calculator.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService{
         user.setRoles(roles);
 
         //setup status
-        user.setStatus(UserStatusName.ACTIVE);
+        user.setStatus(UserStatus.ACTIVE);
 
         //setup initial balance
         long initialBalance = systemConfigurationService.getLongConfiguration(DEFAULT_BALANCE_CONFIGURATION, 0L);

@@ -7,7 +7,7 @@ public class AppRecordFactory {
     public static AppRecord buildFromRecord(Record record){
         AppRecord appRecord = null;
         if(record!=null){
-            String serviceNameExecuted = record.getService()!=null?record.getService().getName().name():null;
+            String serviceNameExecuted = record.getService()!=null?record.getService().getType().name():null;
             String caller = record.getUser()!=null ? record.getUser().getUsername():null;
             long executionDate = record.getExecutionDate()!=null?record.getExecutionDate().getTime():0L;
 

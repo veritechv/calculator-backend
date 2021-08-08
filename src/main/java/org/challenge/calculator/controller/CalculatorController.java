@@ -12,6 +12,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * This is the main controller for the service execution.
+ * Depending on the endpoint is the type of service we can execute.
+ * Before calling the actual service we do a basic validation to check if
+ * we have the basic information to:
+ * - identify the service
+ * - identify the user calling the service
+ * - and the parameters needed for the execution
+ *
+ * Notes: As a future work this controller can delegate to the service the task
+ * of identify and call the appropiate service based on it's information.
+ */
 @RestController
 @RequestMapping("/calculator")
 @CrossOrigin
@@ -38,6 +50,8 @@ public class CalculatorController {
         this.squareRootService = squareRootService;
         this.freeFormService = freeFormService;
     }
+
+    /*TODO CHANGE TO LEAVE THE CALCULATOR SERVICE DETERMINE WHICH SERVICE TO CALL*/
 
     @GetMapping("/randomString")
     public ResponseEntity<ServiceResponse> generateRandomString(@RequestBody ServiceRequest serviceRequest){

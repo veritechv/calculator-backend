@@ -1,7 +1,6 @@
 package org.challenge.calculator.entity;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.challenge.calculator.enums.UserStatusName;
+import org.challenge.calculator.enums.UserStatus;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -30,7 +29,7 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private UserStatusName status;
+    private UserStatus status;
 
     @Column(nullable=false)
     private long balance;
@@ -39,7 +38,7 @@ public class User {
         uuid = UUID.randomUUID().toString();
     }
 
-    public User(String username, String password, Set<Role> roles, UserStatusName status, long balance) {
+    public User(String username, String password, Set<Role> roles, UserStatus status, long balance) {
         super();
         this.username = username;
         this.password = password;
@@ -88,11 +87,11 @@ public class User {
         this.roles = roles;
     }
 
-    public UserStatusName getStatus() {
+    public UserStatus getStatus() {
         return status;
     }
 
-    public void setStatus(UserStatusName status) {
+    public void setStatus(UserStatus status) {
         this.status = status;
     }
 
@@ -105,6 +104,6 @@ public class User {
     }
 
     public boolean isActive(){
-        return getStatus() != null && getStatus() == UserStatusName.ACTIVE;
+        return getStatus() != null && getStatus() == UserStatus.ACTIVE;
     }
 }

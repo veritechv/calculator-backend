@@ -1,6 +1,6 @@
 package org.challenge.calculator.enums;
 
-public enum ServiceStatusName {
+public enum ServiceStatus {
     ACTIVE,
     BETA,
     INACTIVE

@@ -33,6 +33,7 @@ public class LoginController {
 
         if(userCredentials!=null &&
                 StringUtils.isNoneBlank(userCredentials.getUsername(), userCredentials.getPassword())) {
+            //TODO sanitize input
             String username = userCredentials.getUsername();
             String password = userCredentials.getPassword();
             token = loginService.loginUser(username, password);
@@ -50,6 +51,7 @@ public class LoginController {
         ResponseEntity<String> response = null;
         if(userCredentials!=null &&
                 StringUtils.isNoneBlank(userCredentials.getUsername(), userCredentials.getPassword())) {
+            //TODO sanitize input
             String username = userCredentials.getUsername();
             String password = userCredentials.getPassword();
             try {

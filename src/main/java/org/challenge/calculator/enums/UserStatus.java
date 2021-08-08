@@ -1,6 +1,6 @@
 package org.challenge.calculator.enums;
 
-public enum UserStatusName {
+public enum UserStatus {
     ACTIVE,
     TRIAL,
     INACTIVE

@@ -1,7 +1,7 @@
 package org.challenge.calculator.entity;
 
-import org.challenge.calculator.enums.ServiceName;
-import org.challenge.calculator.enums.ServiceStatusName;
+import org.challenge.calculator.enums.ServiceStatus;
+import org.challenge.calculator.enums.ServiceType;
 
 import javax.persistence.*;
 import java.util.UUID;
@@ -15,13 +15,22 @@ public class Service {
     @Column(unique=true, nullable=false)
     private String uuid;
 
-    @Enumerated(EnumType.STRING)
-    @Column(unique = true, nullable = false)
-    private ServiceName name;
+    @Column(unique=true, nullable = false)
+    private String name;
+
+    @Column
+    private String description;
+
+    @Column(columnDefinition = "numeric default 1")
+    private int numParameters;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ServiceStatusName status;
+    private ServiceType type;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ServiceStatus status;
 
     @Column(columnDefinition = "numeric default 0")
     private long cost;
@@ -31,11 +40,13 @@ public class Service {
         uuid = UUID.randomUUID().toString();
     }
 
-    public Service(String uuid, ServiceName serviceName, ServiceStatusName serviceStatusName, long cost) {
-        super();
+    public Service(String uuid, String name, String description, int numParameters, ServiceType type, ServiceStatus status, long cost) {
         this.uuid = uuid;
-        this.name = serviceName;
-        this.status = serviceStatusName;
+        this.name = name;
+        this.description = description;
+        this.numParameters = numParameters;
+        this.type = type;
+        this.status = status;
         this.cost = cost;
     }
 
@@ -55,20 +66,36 @@ public class Service {
         this.uuid = uuid;
     }
 
-    public ServiceName getName() {
+    public String getName() {
         return name;
     }
 
-    public void setName(ServiceName serviceName) {
-        this.name = serviceName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public ServiceStatusName getStatus() {
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public ServiceType getType() {
+        return type;
+    }
+
+    public void setType(ServiceType type) {
+        this.type = type;
+    }
+
+    public ServiceStatus getStatus() {
         return status;
     }
 
-    public void setStatus(ServiceStatusName serviceStatusName) {
-        this.status = serviceStatusName;
+    public void setStatus(ServiceStatus status) {
+        this.status = status;
     }
 
     public long getCost() {
@@ -77,5 +104,13 @@ public class Service {
 
     public void setCost(long cost) {
         this.cost = cost;
+    }
+
+    public int getNumParameters() {
+        return numParameters;
+    }
+
+    public void setNumParameters(int numParameters) {
+        this.numParameters = numParameters;
     }
 }

@@ -1,6 +1,6 @@
 package org.challenge.calculator.enums;
 
-public enum ServiceName {
+public enum ServiceType {
     ADDITION,
     SUBTRACTION,
     MULTIPLICATION,
