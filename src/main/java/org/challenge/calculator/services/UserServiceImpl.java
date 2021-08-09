@@ -115,7 +115,7 @@ public class UserServiceImpl implements UserService {
     public User updateUser(User user) {
         if (user != null) {
             Optional<User> existingUserOptional = userRepository.findByUsername(user.getUsername());
-            if (existingUserOptional.isEmpty()) {
+            if (!existingUserOptional.isPresent()) {
                 LOGGER.error("we couldn't find the user[" + user.getUsername() + "] for update.");
                 throw new UsernameNotFoundException("The user [" + user.getUsername() + "] was not found.");
             }
@@ -150,7 +150,7 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(String username) {
         if(StringUtils.isNotBlank(username)){
             Optional<User> existingUserOptional = userRepository.findByUsername(username);
-            if(existingUserOptional.isEmpty()){
+            if(!existingUserOptional.isPresent()){
                 LOGGER.error("We couldn't find the user with username["+ username +"]");
                 throw new IllegalArgumentException("We couldn't find the user with username["+ username +"]");
             }

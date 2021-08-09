@@ -55,7 +55,7 @@ public class UsersController {
     @GetMapping(value="/{username}")
     public ResponseEntity<AppUser> searchUser(@PathVariable String username) {
         Optional<User> userOptional = userService.searchUser(username);
-        if (userOptional.isEmpty()) {
+        if (!userOptional.isPresent()) {
             LOGGER.info("User [" + username + "] NOT FOUND");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {

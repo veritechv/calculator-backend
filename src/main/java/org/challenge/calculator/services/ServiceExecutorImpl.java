@@ -69,7 +69,7 @@ public class ServiceExecutorImpl extends CalculatorService {
             Optional<Service> existingServiceOptional =
                     serviceCalculatorService.searchServiceByUuid(serviceRequest.getServiceUuid());
 
-            if(existingServiceOptional.isEmpty()){
+            if(!existingServiceOptional.isPresent()){
                 LOGGER.error("Couldn't find the service to execute with the UUID["+ serviceRequest.getServiceUuid()+"]");
                 throw new ServiceNotFoundException("Couldn't find the service with the specified data.");
             }

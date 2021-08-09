@@ -1,7 +1,6 @@
 package org.challenge.calculator.services;
 
 import org.apache.commons.lang3.StringUtils;
-import org.challenge.calculator.controller.UsersController;
 import org.challenge.calculator.entity.Record;
 import org.challenge.calculator.entity.User;
 import org.challenge.calculator.exception.RecordNotFoundException;
@@ -10,12 +9,12 @@ import org.challenge.calculator.utils.PagingInformationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
@@ -51,7 +50,7 @@ public class RecordServiceImpl implements RecordService {
         Page<Record> results = null;
         if (StringUtils.isNotBlank(username)) {
             Optional<User> caller = userService.searchUser(username);
-            if (caller.isEmpty()) {
+            if (!caller.isPresent()) {
                 throw new UsernameNotFoundException("The user specified doesn't exist.");
             }
             results = recordRepository.findRecordsByUser(caller.get(), pagingInformation);
@@ -78,7 +77,7 @@ public class RecordServiceImpl implements RecordService {
         if (record != null || StringUtils.isNoneBlank(record.getUuid(), record.getResponse())) {
             Optional<Record> existingRecordOptional = recordRepository.findRecordByUuid(record.getUuid());
 
-            if (existingRecordOptional.isEmpty()) {
+            if (!existingRecordOptional.isPresent()) {
                 LOGGER.error("We couldn't find the record with UUID [" + record.getUuid() + "]");
                 throw new RecordNotFoundException("We couldn't find the record with UUID [" + record.getUuid() + "]");
             }
@@ -107,7 +106,7 @@ public class RecordServiceImpl implements RecordService {
     public void deleteRecord(String recordUuid) {
         if(StringUtils.isNotBlank(recordUuid)){
             Optional<Record> existingRecordOptional = recordRepository.findRecordByUuid(recordUuid);
-            if (existingRecordOptional.isEmpty()) {
+            if (!existingRecordOptional.isPresent()) {
                 LOGGER.error("We couldn't find the record with UUID [" + recordUuid + "]");
                 throw new RecordNotFoundException("We couldn't find the record with UUID [" + recordUuid + "]");
             }

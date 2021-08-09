@@ -70,7 +70,7 @@ public class ServiceCalculatorServiceImpl implements ServiceCalculatorService {
         Service existingService;
         if(service!=null && StringUtils.isNotBlank(service.getUuid())){
             Optional<Service> optionalExistingService = serviceRepository.findByUuid(service.getUuid());
-            if(optionalExistingService.isEmpty()){
+            if(!optionalExistingService.isPresent()){
                 throw new ServiceNotFoundException("The service with UUID ["+service.getUuid()+"] was found");
             }
             existingService = optionalExistingService.get();
@@ -91,7 +91,7 @@ public class ServiceCalculatorServiceImpl implements ServiceCalculatorService {
     public void deleteService(String serviceUuid) {
         if(StringUtils.isNotBlank(serviceUuid)){
             Optional<Service> optionalExistingService = serviceRepository.findByUuid(serviceUuid);
-            if(optionalExistingService.isEmpty()){
+            if(!optionalExistingService.isPresent()){
                 throw new ServiceNotFoundException("The service with UUID ["+serviceUuid+"] was found");
             }
 

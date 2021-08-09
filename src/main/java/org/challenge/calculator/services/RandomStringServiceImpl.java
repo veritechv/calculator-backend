@@ -2,7 +2,13 @@ package org.challenge.calculator.services;
 
 import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.challenge.calculator.exception.CalculatorOperationException;
 import org.challenge.calculator.model.ServiceRequest;
 import org.challenge.calculator.model.ServiceResponse;
@@ -12,10 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
@@ -55,21 +57,36 @@ public class RandomStringServiceImpl extends  CalculatorService{
             Optional<URI> uriOptional = buildURI(url, urlParameters);
 
             if (uriOptional.isPresent()) {
-                HttpRequest.Builder builder = HttpRequest.newBuilder()
+                HttpGet request = new HttpGet(uriOptional.get());
+                // add request headers
+                request.addHeader("Content-Type", "text/plain;charset=UTF-8");
+
+                HttpResponse response = httpClient.execute(request);
+                /*HttpRequest.Builder builder = HttpRequest.newBuilder()
                         .GET()
                         .uri(uriOptional.get())
                         .setHeader("Content-Type", "text/plain;charset=UTF-8");
 
                 HttpRequest request = builder.build();
-                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-                randomString = response != null ? response.body() : randomString;
+                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());*/
+                HttpEntity entity = response.getEntity();
+                String result = null;
+                if (entity != null) {
+                    // return it as a String
+                     result = EntityUtils.toString(entity);
+                     LOGGER.error("No result from "+uriOptional.get());
+                }
+                randomString = StringUtils.defaultIfBlank(result, randomString);
 
             } else {
                 LOGGER.info("The passed url is wrong. Aborting call");
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }finally{
+
         }
+
         return randomString;
     }
 
@@ -89,9 +106,10 @@ public class RandomStringServiceImpl extends  CalculatorService{
     }
 
     private HttpClient buildHttpClient(){
-        return HttpClient.newBuilder()
+        return HttpClients.createDefault();
+        /*return HttpClient.newBuilder()
                 .version(HttpClient.Version.HTTP_2)
                 .connectTimeout(Duration.ofSeconds(10))
-                .build();
+                .build();*/
     }
 }
