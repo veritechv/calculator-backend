@@ -3,20 +3,24 @@ package org.challenge.calculator.model;
 public class AppRecord {
     private String uuid;
     private String serviceName;
-    private String userName;
-    private long executionCost;
-    private long remainingBalance;
+    private String serviceType;
+    private String username;
+    private long cost;
+    private long balance;
     private String response;
-    private long executionDate;
+    private long date;
 
-    public AppRecord(String uuid, String serviceName, String userName, long executionCost, long remainingBalance, String response, long executionDate) {
+    public AppRecord(String uuid, String serviceName, String serviceType,
+                     String userName, long executionCost, long remainingBalance,
+                     String response, long executionDate) {
         this.uuid = uuid;
         this.serviceName = serviceName;
-        this.userName = userName;
-        this.executionCost = executionCost;
-        this.remainingBalance = remainingBalance;
+        this.serviceType = serviceType;
+        this.username = userName;
+        this.cost = executionCost;
+        this.balance = remainingBalance;
         this.response = response;
-        this.executionDate = executionDate;
+        this.date = executionDate;
     }
 
     public String getUuid() {
@@ -35,28 +39,28 @@ public class AppRecord {
         this.serviceName = serviceName;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public long getExecutionCost() {
-        return executionCost;
+    public long getCost() {
+        return cost;
     }
 
-    public void setExecutionCost(long executionCost) {
-        this.executionCost = executionCost;
+    public void setCost(long cost) {
+        this.cost = cost;
     }
 
-    public long getRemainingBalance() {
-        return remainingBalance;
+    public long getBalance() {
+        return balance;
     }
 
-    public void setRemainingBalance(long remainingBalance) {
-        this.remainingBalance = remainingBalance;
+    public void setBalance(long balance) {
+        this.balance = balance;
     }
 
     public String getResponse() {
@@ -67,11 +71,19 @@ public class AppRecord {
         this.response = response;
     }
 
-    public long getExecutionDate() {
-        return executionDate;
+    public long getDate() {
+        return date;
     }
 
-    public void setExecutionDate(long executionDate) {
-        this.executionDate = executionDate;
+    public void setDate(long date) {
+        this.date = date;
+    }
+
+    public String getServiceType() {
+        return serviceType;
+    }
+
+    public void setServiceType(String serviceType) {
+        this.serviceType = serviceType;
     }
 }

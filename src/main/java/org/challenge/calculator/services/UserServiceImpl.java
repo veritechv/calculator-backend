@@ -7,19 +7,23 @@ import org.challenge.calculator.enums.RoleName;
 import org.challenge.calculator.enums.UserStatus;
 import org.challenge.calculator.repository.RoleRepository;
 import org.challenge.calculator.repository.UserRepository;
+import org.challenge.calculator.utils.PagingInformationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Service in charge of a lifecycle of Users.
@@ -50,13 +54,9 @@ public class UserServiceImpl implements UserService {
     }
 
     public Page<User> listUsers(int pageIndex, int pageSize, String sortingField) {
-        Pageable pagingInformation;
         Page<User> result;
-        if (StringUtils.isNotBlank(sortingField)) {
-            pagingInformation = PageRequest.of(pageIndex, pageSize, Sort.by(sortingField));
-        } else {
-            pagingInformation = PageRequest.of(pageIndex, pageSize);
-        }
+        Pageable pagingInformation = PagingInformationUtil.buildPagingInformation(pageIndex, pageSize, sortingField);
+
         try {
             result = userRepository.findAll(pagingInformation);
         } catch (PropertyReferenceException exception) {
@@ -123,12 +123,19 @@ public class UserServiceImpl implements UserService {
             User existingUser = existingUserOptional.get();
             //set values for update
             existingUser.setStatus(user.getStatus());
-            existingUser.setRoles(user.getRoles());
+
+            //get roles
+            Set<Role> roles = new HashSet<>();
+            for(Role role:user.getRoles()){
+
+                Optional<Role> roleFromDb = roleRepository.findByRoleName(role.getRoleName());
+                roleFromDb.ifPresent(r->roles.add(r));
+            }
+            existingUser.setRoles(roles);
             existingUser.setBalance(user.getBalance());
 
             //update the existing user
             user = userRepository.save(existingUser);
-
         }
         return user;
     }
@@ -136,16 +143,16 @@ public class UserServiceImpl implements UserService {
     /**
      * This delete method does a soft delete, meaning that we are going to assign
      * a DELETE status to the user. This way we don't lose service records.
-     * @param userUuid UUID of the user we want to delete.
+     * @param username Username/email of the user we want to delete.
      * @throws IllegalArgumentException if we pass an empty/null/invalid uuid
      */
     @Override
-    public void deleteUser(String userUuid) {
-        if(StringUtils.isNotBlank(userUuid)){
-            Optional<User> existingUserOptional = userRepository.findByUuid(userUuid);
+    public void deleteUser(String username) {
+        if(StringUtils.isNotBlank(username)){
+            Optional<User> existingUserOptional = userRepository.findByUsername(username);
             if(existingUserOptional.isEmpty()){
-                LOGGER.error("We couldn't find the user with UUID["+userUuid+"]");
-                throw new IllegalArgumentException("We couldn't find the user with UUID["+userUuid+"]");
+                LOGGER.error("We couldn't find the user with username["+ username +"]");
+                throw new IllegalArgumentException("We couldn't find the user with username["+ username +"]");
             }
 
             //update the status to DELETE
@@ -153,7 +160,23 @@ public class UserServiceImpl implements UserService {
             userRepository.save(existingUserOptional.get());
             LOGGER.info("User ["+existingUserOptional.get().getUsername()+"] has been deleted");
         }else{
-            throw new IllegalArgumentException("We need a uuid in order to delete the user.");
+            throw new IllegalArgumentException("We need a username in order to delete the user.");
         }
+    }
+
+    /**
+     * Returns the enumeration names of RoleName
+     */
+    @Override
+    public List<String> getUserRoles() {
+        return Stream.of(RoleName.values()).map(type->{ return type.name();}).collect(Collectors.toList());
+    }
+
+    /**
+     * Returns the enumeration names of RoleName
+     */
+    @Override
+    public List<String> getUserStatuses() {
+        return Stream.of(UserStatus.values()).map(type->{ return type.name();}).collect(Collectors.toList());
     }
 }

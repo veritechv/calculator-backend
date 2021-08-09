@@ -6,6 +6,7 @@ import org.challenge.calculator.exception.UserAlreadyExistsException;
 import org.challenge.calculator.model.Token;
 import org.challenge.calculator.model.UserCredentials;
 import org.challenge.calculator.services.LoginService;
+import org.challenge.calculator.utils.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +58,7 @@ public class LoginController {
             try {
                 User newUser = loginService.registerUser(username, password);
                 if(newUser!=null){
-                    response = new ResponseEntity<>(buildJsonSimpleResponse("User registration successful"), HttpStatus.OK);
+                    response = new ResponseEntity<>(JsonUtil.buildJsonSimpleResponse("User registration successful"), HttpStatus.OK);
                 }
             }catch(UserAlreadyExistsException exception){
                 response = new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
@@ -65,14 +66,12 @@ public class LoginController {
         }
 
         response = response == null ?
-                new ResponseEntity<>(buildJsonSimpleResponse("Username/Password incorrect"), HttpStatus.BAD_REQUEST) :
+                new ResponseEntity<>(JsonUtil.buildJsonSimpleResponse("Username/Password incorrect"), HttpStatus.BAD_REQUEST) :
                 response;
 
         return response;
     }
 
-    private String buildJsonSimpleResponse(String response){
-        return "{\"response\":\""+response+"\"}";
-    }
+
 
 }

@@ -6,18 +6,15 @@ import org.challenge.calculator.enums.ServiceStatus;
 import org.challenge.calculator.enums.ServiceType;
 import org.challenge.calculator.exception.ServiceNotFoundException;
 import org.challenge.calculator.repository.ServiceRepository;
+import org.challenge.calculator.utils.PagingInformationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mapping.PropertyReferenceException;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -37,17 +34,29 @@ public class ServiceCalculatorServiceImpl implements ServiceCalculatorService {
     }
 
     @Override
+    public Page<Service> listServicesForAdmin(int pageIndex, int pageSize, String sortingField) {
+        return getServices(pageIndex, pageSize, sortingField, true);
+    }
+
+    @Override
     public Page<Service> listServices(int pageIndex, int pageSize, String sortingField) {
-        Pageable pagingInformation;
+        return getServices(pageIndex, pageSize, sortingField, false);
+    }
+
+    private Page<Service> getServices(int pageIndex, int pageSize, String sortingField, boolean isAdmin) {
         Page<Service> result;
-        if (StringUtils.isNotBlank(sortingField)) {
-            pagingInformation = PageRequest.of(pageIndex, pageSize, Sort.by(sortingField));
-        } else {
-            pagingInformation = PageRequest.of(pageIndex, pageSize);
-        }
+        Pageable pagingInformation = PagingInformationUtil.buildPagingInformation(pageIndex, pageSize, sortingField);
 
         try {
-            result = serviceRepository.findAll(pagingInformation);
+            List<ServiceStatus> requiredStatus;
+            if(isAdmin){
+                requiredStatus = Arrays.asList(ServiceStatus.values());
+            }else{
+                requiredStatus = new ArrayList<>();
+                requiredStatus.add(ServiceStatus.ACTIVE);
+                requiredStatus.add(ServiceStatus.BETA);
+            }
+            result = serviceRepository.findAllByStatusIn(requiredStatus, pagingInformation);
         } catch (PropertyReferenceException exception) {
             LOGGER.info("The paging information is wrong. Please verify. Returning empty results");
             result = Page.empty();

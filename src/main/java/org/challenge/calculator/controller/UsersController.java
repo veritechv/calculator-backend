@@ -5,6 +5,7 @@ import org.challenge.calculator.entity.User;
 import org.challenge.calculator.model.AppUser;
 import org.challenge.calculator.model.AppUserFactory;
 import org.challenge.calculator.services.UserService;
+import org.challenge.calculator.utils.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -86,23 +88,37 @@ public class UsersController {
         return response;
     }
 
-    @DeleteMapping("/{uuid}")
-    public ResponseEntity<String> deleteUser(@PathVariable(name="uuid") String userUuid){
+    @DeleteMapping("/{username}")
+    public ResponseEntity<String> deleteUser(@PathVariable(name="username") String username){
         ResponseEntity<String> response;
-        if(StringUtils.isNotBlank(userUuid)){
+        if(StringUtils.isNotBlank(username)){
             try {
-                userService.deleteUser(userUuid);
-                response =  new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
+                userService.deleteUser(username);
+                response =  new ResponseEntity<>(JsonUtil.buildJsonSimpleResponse("User deleted successfully"), HttpStatus.OK);
             }catch(IllegalArgumentException exception){
-                response =  new ResponseEntity<>("The received information is wrong. Please verify", HttpStatus.BAD_REQUEST);
+                response =  new ResponseEntity<>(JsonUtil.buildJsonSimpleResponse("The received information is wrong. Please verify"), HttpStatus.BAD_REQUEST);
             }
         }else{
-            response =  new ResponseEntity<>("The received information is wrong. Please verify", HttpStatus.BAD_REQUEST);
+            response =  new ResponseEntity<>(JsonUtil.buildJsonSimpleResponse("The received information is wrong. Please verify"), HttpStatus.BAD_REQUEST);
         }
 
         return response;
-
     }
 
+    /**
+     * Get the list/catalog of user roles
+     */
+    @GetMapping("/roles")
+    public ResponseEntity<List<String>> userRoles(){
+        return new ResponseEntity<>(userService.getUserRoles(), HttpStatus.OK);
+    }
+
+    /**
+     * Get the list/catalog of user statuses
+     */
+    @GetMapping("/statuses")
+    public ResponseEntity<List<String>> userStatuses(){
+        return new ResponseEntity<>(userService.getUserStatuses(), HttpStatus.OK);
+    }
 
 }

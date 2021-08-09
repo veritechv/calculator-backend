@@ -7,7 +7,25 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ServiceCalculatorService {
+    /**
+     * Get the list of services registered for regular users
+     * @param pageIndex Page number we want back
+     * @param pageSize Number of services in the response list
+     * @param sortingField Name of the attribute to use for sorting
+     * @return a list of services
+     */
     Page<Service> listServices(int pageIndex, int pageSize, String sortingField);
+
+    /**
+     * Get the list of all services registered in the system for admin purposes
+     * @param pageIndex Page number we want back
+     * @param pageSize Number of services in the response list
+     * @param sortingField Name of the attribute to use for sorting
+     * @return a list of services
+     */
+    Page<Service> listServicesForAdmin(int pageIndex, int pageSize, String sortingField);
+
+
     Optional<Service> searchServiceByUuid(String Uuid);
 
     /**

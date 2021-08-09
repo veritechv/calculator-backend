@@ -5,6 +5,7 @@ import org.challenge.calculator.exception.ServiceNotFoundException;
 import org.challenge.calculator.model.AppService;
 import org.challenge.calculator.model.AppServiceFactory;
 import org.challenge.calculator.services.ServiceCalculatorService;
+import org.challenge.calculator.utils.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,15 @@ public class ServicesController {
         this.calculatorServiceService = calculatorServiceService;
     }
 
+    @GetMapping("/list/admin")
+    public Page<AppService> listServicesForAdmin(@RequestParam(defaultValue = "0") Integer pageIndex,
+                                         @RequestParam(defaultValue = "20") Integer pageSize,
+                                         @RequestParam(defaultValue = "name") String sortBy) {
+
+        return AppServiceFactory.buildFromPageService(calculatorServiceService.listServicesForAdmin(pageIndex,
+                pageSize, sortBy));
+    }
+
     @GetMapping("/list")
     public Page<AppService> listServices(@RequestParam(defaultValue = "0") Integer pageIndex,
                                          @RequestParam(defaultValue = "20") Integer pageSize,
@@ -35,6 +45,7 @@ public class ServicesController {
         return AppServiceFactory.buildFromPageService(calculatorServiceService.listServices(pageIndex,
                 pageSize, sortBy));
     }
+
 
     @GetMapping("/types")
     public ResponseEntity<List<String>> serviceTypes(){
@@ -65,11 +76,11 @@ public class ServicesController {
         ResponseEntity<String> response;
         try {
             calculatorServiceService.deleteService(serviceUuid);
-            response = new ResponseEntity("Service deleted successfully!.", HttpStatus.OK);
+            response = new ResponseEntity(JsonUtil.buildJsonSimpleResponse("Service deleted successfully!."), HttpStatus.OK);
 
         } catch (ServiceNotFoundException | IllegalArgumentException exception) {
             LOGGER.error(exception.getMessage());
-            response = new ResponseEntity("The received information is wrong. Please verify.",
+            response = new ResponseEntity(JsonUtil.buildJsonSimpleResponse("The received information is wrong. Please verify."),
                     HttpStatus.BAD_REQUEST);
         }
         return response;

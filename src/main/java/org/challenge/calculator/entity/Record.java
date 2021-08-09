@@ -32,7 +32,7 @@ public class Record {
     private String response;
 
     @Column(nullable = false)
-    private Date executionDate;
+    private Date date;
 
     public Record() {
         uuid = UUID.randomUUID().toString();
@@ -45,7 +45,7 @@ public class Record {
         this.cost = executionCost;
         this.balance = remainingBalance;
         this.response = serviceResponse;
-        this.executionDate = executionDate;
+        this.date = executionDate;
     }
 
     public long getId() {
@@ -104,11 +104,11 @@ public class Record {
         this.response = serviceResponse;
     }
 
-    public Date getExecutionDate() {
-        return executionDate;
+    public Date getDate() {
+        return date;
     }
 
-    public void setExecutionDate(Date executionDate) {
-        this.executionDate = executionDate;
+    public void setDate(Date executionDate) {
+        this.date = executionDate;
     }
 }

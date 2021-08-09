@@ -21,7 +21,7 @@ public class AppUserFactory {
         if(user!=null){
             List<String> roles = user.getRoles().stream().map(role -> role.getRoleName().name()).
                     collect(Collectors.toList());
-            appUser = new AppUser(user.getUsername(), roles, user.getBalance(),
+            appUser = new AppUser(user.getUuid(), user.getUsername(),  roles, user.getBalance(),
                     user.getStatus().name());
         }
         return appUser;
