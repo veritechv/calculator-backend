@@ -37,7 +37,7 @@ public class ServiceRequestInterceptor {
         this.recordService = recordService;
     }
 
-    @Around("execution(* org.challenge.calculator.services.CalculatorService.execute*(..))")
+    @Around("execution(* org.challenge.calculator.services.CalculatorService.execute*(..)) && !target(org.challenge.calculator.services.ServiceExecutorImpl)")
     public Object auditMethod(ProceedingJoinPoint jp) throws Throwable {
         String methodName = jp.getSignature().getName();
         String serviceName = jp.getSignature().getDeclaringType().getSimpleName();
@@ -47,10 +47,10 @@ public class ServiceRequestInterceptor {
 
         if (jp.getArgs().length > 0 && (jp.getArgs()[0] instanceof ServiceRequest)) {
             ServiceRequest serviceRequest = (ServiceRequest) jp.getArgs()[0];
-            if (serviceRequest != null && StringUtils.isNoneBlank(serviceRequest.getServiceUUID(), serviceRequest.getUsername())) {
+            if (serviceRequest != null && StringUtils.isNoneBlank(serviceRequest.getServiceUuid(), serviceRequest.getUsername())) {
                 Optional<User> userOptional = userService.searchUser(serviceRequest.getUsername());
                 Optional<Service> serviceOptional =
-                        calculatorServiceService.searchServiceByUuid(serviceRequest.getServiceUUID());
+                        calculatorServiceService.searchServiceByUuid(serviceRequest.getServiceUuid());
 
                 if (userOptional.isPresent() && serviceOptional.isPresent()) {
                     if (ServiceUsageCalculator.isBalanceEnough(userOptional.get(), serviceOptional.get())) {
@@ -72,6 +72,7 @@ public class ServiceRequestInterceptor {
         } else {
             throw new IllegalArgumentException("Service request not valid.");
         }
+        LOGGER.info("returning result");
         return result;
     }
 
@@ -84,8 +85,8 @@ public class ServiceRequestInterceptor {
     }
 
     private Record createRecord(User caller, Service service, long remainingBalance, String response){
-        return recordService.createRecord(new Record(service, caller, service.getCost(),
-                remainingBalance, response, new Date()));
+        Record record = new Record(service, caller, service.getCost(), remainingBalance, response, new Date());
+        return recordService.createRecord(record);
     }
 
 }

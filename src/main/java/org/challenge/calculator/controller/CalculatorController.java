@@ -1,10 +1,12 @@
 package org.challenge.calculator.controller;
 
+import org.apache.commons.lang3.StringUtils;
 import org.challenge.calculator.exception.CalculatorOperationException;
 import org.challenge.calculator.exception.InsufficientBalanceForExecution;
 import org.challenge.calculator.model.ServiceRequest;
 import org.challenge.calculator.model.ServiceResponse;
 import org.challenge.calculator.services.CalculatorService;
+import org.challenge.calculator.services.ServiceExecutorImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,12 +38,17 @@ public class CalculatorController {
     private CalculatorService divisionService;
     private CalculatorService squareRootService;
     private CalculatorService freeFormService;
+    private CalculatorService serviceExecutor;
 
     @Autowired
-    public CalculatorController(CalculatorService randomStringService, CalculatorService additionService,
-                                CalculatorService subtractionService, CalculatorService multiplicationService,
-                                CalculatorService divisionService, CalculatorService squareRootService,
-                                CalculatorService freeFormService) {
+    public CalculatorController(CalculatorService randomStringService,
+                                CalculatorService additionService,
+                                CalculatorService subtractionService,
+                                CalculatorService multiplicationService,
+                                CalculatorService divisionService,
+                                CalculatorService squareRootService,
+                                CalculatorService freeFormService,
+                                CalculatorService  serviceExecutor) {
         this.randomStringService = randomStringService;
         this.additionService = additionService;
         this.subtractionService = subtractionService;
@@ -49,41 +56,63 @@ public class CalculatorController {
         this.divisionService = divisionService;
         this.squareRootService = squareRootService;
         this.freeFormService = freeFormService;
+        this.serviceExecutor = serviceExecutor;
     }
 
-    /*TODO CHANGE TO LEAVE THE CALCULATOR SERVICE DETERMINE WHICH SERVICE TO CALL*/
 
-    @GetMapping("/randomString")
+    /**
+     * This endpoint is meant to serve as the only point of contact.
+     * The idea is to handle any kind of service.
+     * @param serviceRequest Object with data about the service we want to execute, parameters and requesting user
+     * @return The result of the service along with other status information
+     */
+    @PatchMapping("/execute")
+    public ResponseEntity<ServiceResponse> executeService(@RequestBody ServiceRequest serviceRequest){
+        ResponseEntity<ServiceResponse> response;
+        try {
+            ServiceResponse serviceResponse = serviceExecutor.execute(serviceRequest);
+            response = new ResponseEntity(serviceResponse, HttpStatus.OK);
+        }catch(InsufficientBalanceForExecution exception){
+            response = new ResponseEntity(exception.getMessage(), HttpStatus.PRECONDITION_FAILED);
+        }catch(CalculatorOperationException exception){
+            response = new ResponseEntity(exception.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+
+        return response;
+    }
+
+
+    @PatchMapping("/randomString")
     public ResponseEntity<ServiceResponse> generateRandomString(@RequestBody ServiceRequest serviceRequest){
         return callService(randomStringService, serviceRequest);
     }
 
-    @GetMapping("/add")
+    @PatchMapping("/add")
     public ResponseEntity<ServiceResponse> addNumbers(@RequestBody ServiceRequest serviceRequest){
         return callService(additionService, serviceRequest);
     }
 
-    @GetMapping("/sub")
+    @PatchMapping("/sub")
     public ResponseEntity<ServiceResponse> subtractNumbers(@RequestBody ServiceRequest serviceRequest){
         return callService(subtractionService, serviceRequest);
     }
 
-    @GetMapping("/multiply")
+    @PatchMapping("/multiply")
     public ResponseEntity<ServiceResponse> multiplyNumbers(@RequestBody ServiceRequest serviceRequest){
         return callService(multiplicationService, serviceRequest);
     }
 
-    @GetMapping("/divide")
+    @PatchMapping("/divide")
     public ResponseEntity<ServiceResponse> divideNumbers(@RequestBody ServiceRequest serviceRequest){
         return callService(divisionService, serviceRequest);
     }
 
-    @GetMapping("/squareroot")
+    @PatchMapping("/squareroot")
     public ResponseEntity<ServiceResponse> squareRootOfNumber(@RequestBody ServiceRequest serviceRequest){
         return callService(squareRootService, serviceRequest);
     }
 
-    @GetMapping("/freeform")
+    @PatchMapping("/freeform")
     public ResponseEntity<ServiceResponse> calculateFreeFormOperation(@RequestBody ServiceRequest serviceRequest){
         return callService(freeFormService, serviceRequest);
     }

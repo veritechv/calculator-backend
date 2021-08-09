@@ -1,13 +1,10 @@
 package org.challenge.calculator.services;
 
-import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.challenge.calculator.controller.CalculatorController;
 import org.challenge.calculator.entity.Service;
 import org.challenge.calculator.enums.ServiceStatus;
 import org.challenge.calculator.enums.ServiceType;
 import org.challenge.calculator.exception.ServiceNotFoundException;
-import org.challenge.calculator.model.AppService;
 import org.challenge.calculator.repository.ServiceRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mapping.PropertyReferenceException;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -47,7 +43,7 @@ public class ServiceCalculatorServiceImpl implements ServiceCalculatorService {
         if (StringUtils.isNotBlank(sortingField)) {
             pagingInformation = PageRequest.of(pageIndex, pageSize, Sort.by(sortingField));
         } else {
-            pagingInformation = PageRequest.of(pageIndex, pageSize, Sort.by(sortingField));
+            pagingInformation = PageRequest.of(pageIndex, pageSize);
         }
 
         try {

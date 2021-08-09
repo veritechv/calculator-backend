@@ -4,13 +4,10 @@ import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.challenge.calculator.exception.CalculatorOperationException;
-import org.challenge.calculator.utils.ServiceUsageCalculator;
-import org.challenge.calculator.entity.User;
 import org.challenge.calculator.model.ServiceRequest;
 import org.challenge.calculator.model.ServiceResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
@@ -36,7 +33,7 @@ public class RandomStringServiceImpl extends  CalculatorService{
         if(isRequestValid(serviceRequest)){
             String randomString = getRandomStringFromThirdParty(RANDOM_GENERATOR_URL, null);
             serviceResponse = new ServiceResponse();
-            serviceResponse.setServiceUUID(serviceRequest.getServiceUUID());
+            serviceResponse.setServiceUUID(serviceRequest.getServiceUuid());
             serviceResponse.setUsername(serviceRequest.getUsername());
             serviceResponse.setExecutionDate(new Date().getTime());
             serviceResponse.setResponse(randomString);

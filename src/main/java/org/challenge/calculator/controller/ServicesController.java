@@ -65,7 +65,7 @@ public class ServicesController {
         ResponseEntity<String> response;
         try {
             calculatorServiceService.deleteService(serviceUuid);
-            response = new ResponseEntity("Service updated successfully!.", HttpStatus.OK);
+            response = new ResponseEntity("Service deleted successfully!.", HttpStatus.OK);
 
         } catch (ServiceNotFoundException | IllegalArgumentException exception) {
             LOGGER.error(exception.getMessage());

@@ -39,7 +39,7 @@ public class User {
     }
 
     public User(String username, String password, Set<Role> roles, UserStatus status, long balance) {
-        super();
+        this();
         this.username = username;
         this.password = password;
         this.roles = roles;

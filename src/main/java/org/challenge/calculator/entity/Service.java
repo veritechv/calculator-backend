@@ -1,5 +1,6 @@
 package org.challenge.calculator.entity;
 
+import org.apache.commons.lang3.StringUtils;
 import org.challenge.calculator.enums.ServiceStatus;
 import org.challenge.calculator.enums.ServiceType;
 
@@ -112,5 +113,9 @@ public class Service {
 
     public void setNumParameters(int numParameters) {
         this.numParameters = numParameters;
+    }
+
+    public boolean isInactive(){
+        return status != null && status == ServiceStatus.INACTIVE;
     }
 }

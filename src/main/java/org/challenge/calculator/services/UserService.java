@@ -8,10 +8,10 @@ import java.util.Optional;
 
 public interface UserService {
     Optional<User> searchUser(String username);
-    Optional<User> searchUser(long userId);
     User saveUser(User user);
     User createUser(String username, String password);
     User updateUser(User user);
-    Page listUsers(Pageable pageableInformation);
+    void deleteUser(String userUuid);
+    Page listUsers(int pageIndex, int pageSize, String sortingField);
 
 }

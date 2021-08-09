@@ -1,22 +1,26 @@
 package org.challenge.calculator.controller;
 
+import org.apache.commons.lang3.StringUtils;
 import org.challenge.calculator.entity.User;
-import org.challenge.calculator.services.UserService;
 import org.challenge.calculator.model.AppUser;
 import org.challenge.calculator.model.AppUserFactory;
+import org.challenge.calculator.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
+/**
+ * Controller in charge of CRUD operations for User objects
+ */
 @RestController
-@RequestMapping
+@RequestMapping("/users")
 @CrossOrigin
 public class UsersController {
     private static final Logger LOGGER = LoggerFactory.getLogger(UsersController.class);
@@ -27,12 +31,26 @@ public class UsersController {
         this.userService = userService;
     }
 
-    @GetMapping("/users")
-    public Page<AppUser> listUsersPageable(Pageable pageable){
-        return AppUserFactory.buildFromPageUser(userService.listUsers(pageable));
+    /**
+     * Retrieves a list of users using the paging information that come
+     * in the parameters.
+     * @param pageIndex zero based index that indicates the page we want to retrieve
+     * @param pageSize number of elements included in each page
+     * @param sortBy field name used to sort the returne elements
+     * @return A list of users along with paging information that can be used for the next call
+     */
+    @GetMapping
+    public Page<AppUser> listUsers(@RequestParam(defaultValue = "0") Integer pageIndex,
+                                           @RequestParam(defaultValue = "20") Integer pageSize,
+                                           @RequestParam(defaultValue = "username") String sortBy){
+        return AppUserFactory.buildFromPageUser(userService.listUsers(pageIndex, pageSize, sortBy));
     }
 
-    @GetMapping(value="/users/{username}")
+    /**
+     * Retrieves the user information that corresponds to the specified username
+     * @return the user information or an error if the username can't be found.
+     */
+    @GetMapping(value="/{username}")
     public ResponseEntity<AppUser> searchUser(@PathVariable String username) {
         Optional<User> userOptional = userService.searchUser(username);
         if (userOptional.isEmpty()) {
@@ -43,14 +61,48 @@ public class UsersController {
         }
     }
 
-   /* @GetMapping("/search/{id}")
-    public ResponseEntity<AppUser> searchUser(@PathVariable int userId) {
-        Optional<User> userOptional = userService.searchUser(userId);
-        if (userOptional.isEmpty()) {
-            LOGGER.info("User with ID[" + userId + "] NOT FOUND");
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else {
-            return new ResponseEntity<>(AppUserFactory.buildFromUser(userOptional.get()), HttpStatus.OK);
+    /**
+     * This endpoint handles User updates.
+     * One thing we can't update is the password. For this we should use other
+     * mechanism like "Forgot my password"
+     * @param appUser Object holding the information that should be updated.
+     * @return The user, as ack, with the information updated.
+     */
+    @PutMapping
+    public ResponseEntity<AppUser> updateUser(@RequestBody AppUser appUser){
+        ResponseEntity<AppUser> response;
+
+        try{
+        User updatedUser = userService.updateUser(AppUserFactory.buildFromAppUser(appUser));
+        if(updatedUser!=null){
+            response = new ResponseEntity<>(AppUserFactory.buildFromUser(updatedUser), HttpStatus.OK);
+        }else{
+            response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-    }*/
+        }catch (UsernameNotFoundException | IllegalArgumentException exception) {
+            LOGGER.error(exception.getMessage());
+            response = new ResponseEntity("The received information is wrong. Please verify.", HttpStatus.BAD_REQUEST);
+        }
+        return response;
+    }
+
+    @DeleteMapping("/{uuid}")
+    public ResponseEntity<String> deleteUser(@PathVariable(name="uuid") String userUuid){
+        ResponseEntity<String> response;
+        if(StringUtils.isNotBlank(userUuid)){
+            try {
+                userService.deleteUser(userUuid);
+                response =  new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
+            }catch(IllegalArgumentException exception){
+                response =  new ResponseEntity<>("The received information is wrong. Please verify", HttpStatus.BAD_REQUEST);
+            }
+        }else{
+            response =  new ResponseEntity<>("The received information is wrong. Please verify", HttpStatus.BAD_REQUEST);
+        }
+
+        return response;
+
+    }
+
+
 }

@@ -22,13 +22,13 @@ public class Record {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @Column(nullable = false, name="cost")
+    @Column(nullable = false)
     private long cost;
 
-    @Column(nullable = false, name="balance")
+    @Column(nullable = false)
     private long balance;
 
-    @Column(nullable = false, name="response")
+    @Column(nullable = false)
     private String response;
 
     @Column(nullable = false)
@@ -39,6 +39,7 @@ public class Record {
     }
 
     public Record(Service serviceExecuted, User caller, long executionCost, long remainingBalance, String serviceResponse, Date executionDate) {
+        this();
         this.service = serviceExecuted;
         this.user = caller;
         this.cost = executionCost;

@@ -28,13 +28,15 @@ public class AppServiceFactory {
         return transformedPage;
     }
 
-    /*
+    /**
     This method will try to build a Service object out of an AppService one.
-    We can get IllegalArgumentExceptions when trying to convert the service name and status if
-    we pass a name/status that is not in ServiceType/ServiceStatus enumeration.
+     If the status comes empty we assign INACTIVE by default
 
-    If the status comes empty we assign INACTIVE by default
-
+     @param appService object that we want to convert into a Service object.
+     @return A Service object initialized with appService's values, not including the id attribute.
+             We can get IllegalArgumentExceptions when trying to convert the service name
+             and status if we pass a name/status that is not in ServiceType/ServiceStatus
+             enumeration.
      */
     static public Service buildFromAppService(AppService appService) {
         Service service = null;
