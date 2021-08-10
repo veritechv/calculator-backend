@@ -15,8 +15,11 @@
 	<name>calculator</name>
 	<description>Code Challenge</description>
 	<properties>
+		<!--Use java 8 because it's supported by Heroku -->
 		<java.version>8</java.version>
-		<flyway.version>7.12.0</flyway.version>
+
+		<!--using version 6 of flyway because it supports 9.4 -->
+		<flyway.version>6.5.7</flyway.version>
 		<flyway.user>postgres</flyway.user>
 		<flyway.password></flyway.password>
 		<flyway.schemas>settings</flyway.schemas>
@@ -112,22 +115,22 @@
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.flywaydb/flyway-core -->
-		<!--
+
 		<dependency>
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-core</artifactId>
 			<version>${flyway.version}</version>
 		</dependency>
-		-->
+
 
 		<!-- https://mvnrepository.com/artifact/org.flywaydb/flyway-maven-plugin -->
-		<!--
+
 		<dependency>
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-maven-plugin</artifactId>
 			<version>${flyway.version}</version>
 		</dependency>
-		-->
+
 
 		<!-- Math operation evaluator -->
 
@@ -145,7 +148,8 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
-        <!--
+			<!-- To use during development -->
+			<!-- We can use this before starting the app -->
 			<plugin>
 				<groupId>org.flywaydb</groupId>
 				<artifactId>flyway-maven-plugin</artifactId>
@@ -159,7 +163,6 @@
 					</schemas>
 				</configuration>
 			</plugin>
-	    -->
 		</plugins>
 	</build>
 </project>
