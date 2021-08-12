@@ -15,7 +15,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -25,7 +24,7 @@ import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled=true)
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
     @Autowired
@@ -40,8 +39,8 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    PasswordEncoder passwordEncoder(){
-        return  new BCryptPasswordEncoder();
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
@@ -66,11 +65,10 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
         Usually this is not needed, only using @CrossOrigin annotation in the controller should suffice
      */
     @Bean
-    CorsConfigurationSource corsConfigurationSource()
-    {
+    CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET","POST"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST"));
         //the below three lines will add the relevant CORS response headers
         configuration.addAllowedOrigin("*");
         configuration.addAllowedHeader("*");
@@ -80,12 +78,10 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
         return source;
     }
 
-   /* @Bean
-    CorsFilter corsFilter() {
-        CorsFilter filter = new CorsFilter();
-        return filter;
-    }*/
-
+    /*
+     * Main configuration of spring security.
+     * Notice the pattern for login and signup that include the v for the api versioning.
+     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
@@ -93,7 +89,7 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
                 //.addFilterBefore(corsFilter(), SessionManagementFilter.class)
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/login/**", "/register/**").permitAll()
+                .antMatchers("/v*/login/**", "/v*/signup/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling().authenticationEntryPoint(jwtEntryPoint)

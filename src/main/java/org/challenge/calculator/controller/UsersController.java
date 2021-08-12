@@ -22,7 +22,7 @@ import java.util.Optional;
  * Controller in charge of CRUD operations for User objects
  */
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/v1/users")
 @CrossOrigin
 public class UsersController {
     private static final Logger LOGGER = LoggerFactory.getLogger(UsersController.class);

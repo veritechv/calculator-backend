@@ -118,4 +118,8 @@ public class Service {
     public boolean isInactive(){
         return status != null && status == ServiceStatus.INACTIVE;
     }
+
+    public boolean isDeleted(){
+        return status != null && status == ServiceStatus.DELETED;
+    }
 }

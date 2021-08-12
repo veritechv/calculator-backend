@@ -15,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/login")
+@RequestMapping("/v1/login")
 @CrossOrigin
 public class LoginController {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginController.class);
@@ -27,12 +27,12 @@ public class LoginController {
         this.loginService = loginService;
     }
 
-    @PostMapping(value="/authenticate")
-    public ResponseEntity<Token> login(@RequestBody UserCredentials userCredentials){
+    @PostMapping(value = "/authenticate")
+    public ResponseEntity<Token> login(@RequestBody UserCredentials userCredentials) {
         ResponseEntity<Token> responseEntity;
         Token token = null;
 
-        if(userCredentials!=null &&
+        if (userCredentials != null &&
                 StringUtils.isNoneBlank(userCredentials.getUsername(), userCredentials.getPassword())) {
             //TODO sanitize input
             String username = userCredentials.getUsername();
@@ -41,26 +41,26 @@ public class LoginController {
         }
 
         responseEntity = token == null ?
-                new ResponseEntity<>(HttpStatus.UNAUTHORIZED) :
+                new ResponseEntity(JsonUtil.buildJsonSimpleResponse("Wrong username/password. Please verify"), HttpStatus.UNAUTHORIZED) :
                 new ResponseEntity<>(token, HttpStatus.OK);
 
         return responseEntity;
     }
 
-    @PostMapping(value="/register")
-    public ResponseEntity<String> register(@RequestBody UserCredentials userCredentials){
+    @PostMapping(value = "/signup")
+    public ResponseEntity<String> register(@RequestBody UserCredentials userCredentials) {
         ResponseEntity<String> response = null;
-        if(userCredentials!=null &&
+        if (userCredentials != null &&
                 StringUtils.isNoneBlank(userCredentials.getUsername(), userCredentials.getPassword())) {
             //TODO sanitize input
             String username = userCredentials.getUsername();
             String password = userCredentials.getPassword();
             try {
                 User newUser = loginService.registerUser(username, password);
-                if(newUser!=null){
+                if (newUser != null) {
                     response = new ResponseEntity<>(JsonUtil.buildJsonSimpleResponse("User registration successful"), HttpStatus.OK);
                 }
-            }catch(UserAlreadyExistsException exception){
+            } catch (UserAlreadyExistsException exception) {
                 response = new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
             }
         }
@@ -71,7 +71,4 @@ public class LoginController {
 
         return response;
     }
-
-
-
 }

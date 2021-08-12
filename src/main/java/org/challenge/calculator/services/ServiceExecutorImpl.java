@@ -18,7 +18,7 @@ import java.util.Optional;
 @org.springframework.stereotype.Service("serviceExecutor")
 public class ServiceExecutorImpl extends CalculatorService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceExecutorImpl.class);
-    private ServiceCalculatorServiceImpl serviceCalculatorService;
+    private ServiceCalculatorService serviceCalculatorService;
 
     private CalculatorService randomStringService;
     private CalculatorService additionService;
@@ -29,7 +29,7 @@ public class ServiceExecutorImpl extends CalculatorService {
     private CalculatorService freeFormService;
 
     @Autowired
-    public ServiceExecutorImpl(ServiceCalculatorServiceImpl serviceCalculatorService,
+    public ServiceExecutorImpl(ServiceCalculatorService serviceCalculatorService,
                                CalculatorService randomStringService,
                                CalculatorService additionService,
                                CalculatorService subtractionService,
@@ -75,9 +75,9 @@ public class ServiceExecutorImpl extends CalculatorService {
             }
             Service existingService = existingServiceOptional.get();
             //check if the service is not inactive
-            if(existingService.isInactive()){
-                LOGGER.error("We can't execute a service that is inactive.");
-                throw new CalculatorOperationException("We can't execute a service that is inactive.");
+            if(existingService.getStatus() ==  null && existingService.isInactive() || existingService.isDeleted()){
+                LOGGER.error("We can't execute a service that is not active.");
+                throw new CalculatorOperationException("We can't execute a service that is not active.");
             }
 
             //check if the number of parameters received is the same as the number we expect

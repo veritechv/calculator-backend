@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/services")
+@RequestMapping("/v1/services")
 @CrossOrigin
 public class ServicesController {
     private static final Logger LOGGER = LoggerFactory.getLogger(ServicesController.class);
