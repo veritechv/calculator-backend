@@ -55,13 +55,10 @@ public class LoginController {
             //TODO sanitize input
             String username = userCredentials.getUsername();
             String password = userCredentials.getPassword();
-            try {
-                User newUser = loginService.registerUser(username, password);
-                if (newUser != null) {
-                    response = new ResponseEntity<>(JsonUtil.buildJsonSimpleResponse("User registration successful"), HttpStatus.OK);
-                }
-            } catch (CalculatorException exception) {
-                response = new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
+
+            User newUser = loginService.registerUser(username, password);
+            if (newUser != null) {
+                response = new ResponseEntity<>(JsonUtil.buildJsonSimpleResponse("User registration successful"), HttpStatus.OK);
             }
         }
 

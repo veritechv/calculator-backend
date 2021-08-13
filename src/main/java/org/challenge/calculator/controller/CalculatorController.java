@@ -66,8 +66,7 @@ public class CalculatorController {
      */
     @PatchMapping("/execute")
     public ResponseEntity<ServiceResponse> executeService(@RequestBody ServiceRequest serviceRequest) {
-        ResponseEntity<ServiceResponse> response = callService(serviceExecutor, serviceRequest);
-        return response;
+        return  callService(serviceExecutor, serviceRequest);
     }
 
 
@@ -112,16 +111,11 @@ public class CalculatorController {
 
     /*
      * Method to handle the exceptions that may happen
-     * TODO Use an exception handler
      */
     private ResponseEntity<ServiceResponse> callService(CalculatorService service, ServiceRequest serviceRequest) {
         ResponseEntity<ServiceResponse> responseEntity;
-        try {
-            ServiceResponse serviceResponse = service.execute(serviceRequest);
-            responseEntity = new ResponseEntity(serviceResponse, HttpStatus.OK);
-        } catch (CalculatorException exception) {
-            responseEntity = new ResponseEntity(exception.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+        ServiceResponse serviceResponse = service.execute(serviceRequest);
+        responseEntity = new ResponseEntity(serviceResponse, HttpStatus.OK);
         return responseEntity;
     }
 

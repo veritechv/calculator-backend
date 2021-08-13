@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -77,17 +76,13 @@ public class UsersController {
     public ResponseEntity<AppUser> updateUser(@RequestBody AppUser appUser) {
         ResponseEntity<AppUser> response;
 
-        try {
-            User updatedUser = userService.updateUser(AppUserFactory.buildFromAppUser(appUser));
-            if (updatedUser != null) {
-                response = new ResponseEntity<>(AppUserFactory.buildFromUser(updatedUser), HttpStatus.OK);
-            } else {
-                response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-        } catch (UsernameNotFoundException | IllegalArgumentException exception) {
-            LOGGER.error(exception.getMessage());
-            response = new ResponseEntity("The received information is wrong. Please verify.", HttpStatus.BAD_REQUEST);
+        User updatedUser = userService.updateUser(AppUserFactory.buildFromAppUser(appUser));
+        if (updatedUser != null) {
+            response = new ResponseEntity<>(AppUserFactory.buildFromUser(updatedUser), HttpStatus.OK);
+        } else {
+            response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+
         return response;
     }
 
@@ -95,16 +90,11 @@ public class UsersController {
     public ResponseEntity<String> deleteUser(@PathVariable(name = "username") String username) {
         ResponseEntity<String> response;
         if (StringUtils.isNotBlank(username)) {
-            try {
-                userService.deleteUser(username);
-                response = new ResponseEntity<>(JsonUtil.buildJsonSimpleResponse("User deleted successfully"), HttpStatus.OK);
-            } catch (IllegalArgumentException exception) {
-                response = new ResponseEntity<>(JsonUtil.buildJsonSimpleResponse("The received information is wrong. Please verify"), HttpStatus.BAD_REQUEST);
-            }
+            userService.deleteUser(username);
+            response = new ResponseEntity<>(JsonUtil.buildJsonSimpleResponse("User deleted successfully"), HttpStatus.OK);
         } else {
             response = new ResponseEntity<>(JsonUtil.buildJsonSimpleResponse("The received information is wrong. Please verify"), HttpStatus.BAD_REQUEST);
         }
-
         return response;
     }
 

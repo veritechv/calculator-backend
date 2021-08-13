@@ -2,7 +2,6 @@ package org.challenge.calculator.controller;
 
 import org.apache.commons.lang3.StringUtils;
 import org.challenge.calculator.entity.Record;
-import org.challenge.calculator.exception.CalculatorException;
 import org.challenge.calculator.model.AppRecord;
 import org.challenge.calculator.model.AppRecordFactory;
 import org.challenge.calculator.services.RecordService;
@@ -61,15 +60,11 @@ public class RecordsController {
         ResponseEntity<AppRecord> response;
 
         if (appRecord != null) {
-            try {
-                Record record = recordService.updateRecord(AppRecordFactory.buildFromAppRecord(appRecord));
-                if (record != null) {
-                    response = new ResponseEntity<>(AppRecordFactory.buildFromRecord(record), HttpStatus.OK);
-                } else {
-                    response = new ResponseEntity("Update failed. Please verify data.", HttpStatus.BAD_REQUEST);
-                }
-            } catch (CalculatorException exception) {
-                response = new ResponseEntity(exception.getMessage(), HttpStatus.BAD_REQUEST);
+            Record record = recordService.updateRecord(AppRecordFactory.buildFromAppRecord(appRecord));
+            if (record != null) {
+                response = new ResponseEntity<>(AppRecordFactory.buildFromRecord(record), HttpStatus.OK);
+            } else {
+                response = new ResponseEntity("Update failed. Please verify data.", HttpStatus.BAD_REQUEST);
             }
         } else {
             response = new ResponseEntity("Update failed. Invalid data", HttpStatus.BAD_REQUEST);
@@ -87,17 +82,12 @@ public class RecordsController {
     public ResponseEntity<String> deleteRecord(@PathVariable(name = "uuid") String recordUuid) {
         ResponseEntity<String> response;
         if (StringUtils.isNotBlank(recordUuid)) {
-            try {
-                recordService.deleteRecord(recordUuid);
-                response = new ResponseEntity<>(JsonUtil.buildJsonSimpleResponse("Record deleted successfully!"), HttpStatus.OK);
-            } catch (CalculatorException exception) {
-                response = new ResponseEntity<>(JsonUtil.buildJsonSimpleResponse(exception.getMessage()), HttpStatus.BAD_REQUEST);
-            }
-
+            recordService.deleteRecord(recordUuid);
+            response = new ResponseEntity<>(JsonUtil.buildJsonSimpleResponse("Record deleted successfully!"), HttpStatus.OK);
         } else {
-            response = new ResponseEntity<>(JsonUtil.buildJsonSimpleResponse("Invalid data. Please verify"), HttpStatus.BAD_REQUEST);
+            response = new ResponseEntity<>(JsonUtil.buildJsonSimpleResponse("Invalid data. Please verify"),
+                    HttpStatus.BAD_REQUEST);
         }
-
         return response;
     }
 }

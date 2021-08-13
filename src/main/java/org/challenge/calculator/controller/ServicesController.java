@@ -55,34 +55,20 @@ public class ServicesController {
     @PutMapping()
     public ResponseEntity<AppService> updateService(@RequestBody AppService service) {
         ResponseEntity<AppService> response;
-        try {
-
-            Service updatedService = calculatorServiceService.updateService(AppServiceFactory.buildFromAppService(service));
-            if (updatedService != null) {
-                response = new ResponseEntity<>(AppServiceFactory.buildFromService(updatedService), HttpStatus.OK);
-            } else {
-                response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-        } catch (CalculatorException exception) {
-            LOGGER.error(exception.getMessage());
-            response = new ResponseEntity("The received information is wrong. Please verify.", HttpStatus.BAD_REQUEST);
+        Service updatedService = calculatorServiceService.updateService(AppServiceFactory.buildFromAppService(service));
+        if (updatedService != null) {
+            response = new ResponseEntity<>(AppServiceFactory.buildFromService(updatedService), HttpStatus.OK);
+        } else {
+            response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-
         return response;
     }
 
     @DeleteMapping("/{uuid}")
     public ResponseEntity<String> deleteService(@PathVariable(name = "uuid") String serviceUuid) {
         ResponseEntity<String> response;
-        try {
-            calculatorServiceService.deleteService(serviceUuid);
-            response = new ResponseEntity(JsonUtil.buildJsonSimpleResponse("Service deleted successfully!."), HttpStatus.OK);
-
-        } catch (CalculatorException exception) {
-            LOGGER.error(exception.getMessage());
-            response = new ResponseEntity(JsonUtil.buildJsonSimpleResponse("The received information is wrong. Please verify."),
-                    HttpStatus.BAD_REQUEST);
-        }
+        calculatorServiceService.deleteService(serviceUuid);
+        response = new ResponseEntity(JsonUtil.buildJsonSimpleResponse("Service deleted successfully!."), HttpStatus.OK);
         return response;
     }
 
@@ -91,17 +77,10 @@ public class ServicesController {
     public ResponseEntity<AppService> registerService(@RequestBody AppService newService) {
         ResponseEntity<AppService> response = null;
         if (newService != null) {
-            try {
-                newService = AppServiceFactory.buildFromService(
-                        calculatorServiceService.createService(
-                                AppServiceFactory.buildFromAppService(newService)));
-
-                response = new ResponseEntity<>(newService, HttpStatus.OK);
-            } catch (IllegalArgumentException exception) {
-                LOGGER.error("Something failed while creating new service.\n" + exception.getMessage());
-                response = new ResponseEntity("The received information is wrong. Please verify.",
-                        HttpStatus.BAD_REQUEST);
-            }
+            newService = AppServiceFactory.buildFromService(
+                    calculatorServiceService.createService(
+                            AppServiceFactory.buildFromAppService(newService)));
+            response = new ResponseEntity<>(newService, HttpStatus.OK);
         }
         return response;
     }
