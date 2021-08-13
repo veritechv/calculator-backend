@@ -2,7 +2,7 @@ package org.challenge.calculator.controller;
 
 import org.apache.commons.lang3.StringUtils;
 import org.challenge.calculator.entity.User;
-import org.challenge.calculator.exception.UserAlreadyExistsException;
+import org.challenge.calculator.exception.CalculatorException;
 import org.challenge.calculator.model.Token;
 import org.challenge.calculator.model.UserCredentials;
 import org.challenge.calculator.services.LoginService;
@@ -60,7 +60,7 @@ public class LoginController {
                 if (newUser != null) {
                     response = new ResponseEntity<>(JsonUtil.buildJsonSimpleResponse("User registration successful"), HttpStatus.OK);
                 }
-            } catch (UserAlreadyExistsException exception) {
+            } catch (CalculatorException exception) {
                 response = new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
             }
         }

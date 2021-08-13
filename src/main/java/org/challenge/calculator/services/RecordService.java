@@ -4,6 +4,9 @@ import org.challenge.calculator.entity.Record;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+/*
+ * Methods expected from a RecordService implementation
+ */
 public interface RecordService {
 
     /*

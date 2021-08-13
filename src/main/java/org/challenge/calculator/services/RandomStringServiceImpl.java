@@ -9,7 +9,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.challenge.calculator.exception.CalculatorOperationException;
+import org.challenge.calculator.exception.CalculatorException;
+import org.challenge.calculator.exception.ErrorCause;
 import org.challenge.calculator.model.ServiceRequest;
 import org.challenge.calculator.model.ServiceResponse;
 import org.slf4j.Logger;
@@ -22,17 +23,27 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * This service returns random/non-sense string as result
+ */
 @Service("randomStringService")
-public class RandomStringServiceImpl extends  CalculatorService{
+public class RandomStringServiceImpl extends CalculatorService {
+    //TODO move this to the configuration table, breaking up the parameters
     private static final String RANDOM_GENERATOR_URL = "https://www.random.org/strings/?num=1&len=10&digits=on&upperalpha=on&loweralpha=on&unique=on&format=plain&rnd=new";
     private static final Logger LOGGER = LoggerFactory.getLogger(RandomStringServiceImpl.class);
 
 
+    /**
+     * This method does a get request to the RANDOOM_GENERATOR_URL and that's it.
+     *
+     * @param serviceRequest Object holding the data needed by the service to execute.
+     * @return The string returned by the service pointed by RANDOM_GENERATOR_URL
+     */
     @Override
     public ServiceResponse execute(ServiceRequest serviceRequest) {
-        ServiceResponse serviceResponse = null;
+        ServiceResponse serviceResponse;
 
-        if(isRequestValid(serviceRequest)){
+        if (isRequestValid(serviceRequest)) {
             String randomString = getRandomStringFromThirdParty(RANDOM_GENERATOR_URL, null);
             serviceResponse = new ServiceResponse();
             serviceResponse.setServiceUUID(serviceRequest.getServiceUuid());
@@ -40,15 +51,23 @@ public class RandomStringServiceImpl extends  CalculatorService{
             serviceResponse.setExecutionDate(new Date().getTime());
             serviceResponse.setResponse(randomString);
 
-        }else{
+        } else {
             LOGGER.error("Some of the parameters are incorrect. Please check");
-            throw new CalculatorOperationException("Some of the parameters are incorrect. Please check");
+            throw new CalculatorException("Some of the parameters are incorrect. Please check",
+                    ErrorCause.INVALID_PARAMETERS);
         }
 
         return serviceResponse;
 
     }
 
+    /**
+     * This method does de actual call to the third party service
+     *
+     * @param url           url of the third party service
+     * @param urlParameters any additional parameters that the third party might need
+     * @return the response as a String
+     */
     private String getRandomStringFromThirdParty(String url, Map<String, String> urlParameters) {
         String randomString = "";
         HttpClient httpClient = buildHttpClient();
@@ -62,41 +81,37 @@ public class RandomStringServiceImpl extends  CalculatorService{
                 request.addHeader("Content-Type", "text/plain;charset=UTF-8");
 
                 HttpResponse response = httpClient.execute(request);
-                /*HttpRequest.Builder builder = HttpRequest.newBuilder()
-                        .GET()
-                        .uri(uriOptional.get())
-                        .setHeader("Content-Type", "text/plain;charset=UTF-8");
-
-                HttpRequest request = builder.build();
-                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());*/
                 HttpEntity entity = response.getEntity();
                 String result = null;
                 if (entity != null) {
                     // return it as a String
-                     result = EntityUtils.toString(entity);
-                     LOGGER.error("No result from "+uriOptional.get());
+                    result = EntityUtils.toString(entity);
+                    LOGGER.error("No result from " + uriOptional.get());
                 }
                 randomString = StringUtils.defaultIfBlank(result, randomString);
 
             } else {
                 LOGGER.info("The passed url is wrong. Aborting call");
+                throw new CalculatorException("The passed url is wrong. Aborting call", ErrorCause.INVALID_PARAMETERS);
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }finally{
+        } finally {
 
         }
-
         return randomString;
     }
 
+    /**
+     * Builds up the url adding the parameters to it
+     */
     private Optional<URI> buildURI(String url, Map<String, String> urlParameters) throws URISyntaxException {
         URI uri = null;
 
-        if(StringUtils.isNotBlank(url)){
+        if (StringUtils.isNotBlank(url)) {
             URIBuilder uriBuilder = new URIBuilder(url);
-            if(!Collections.isEmpty(urlParameters)){
-                urlParameters.entrySet().forEach(parameter->{
+            if (!Collections.isEmpty(urlParameters)) {
+                urlParameters.entrySet().forEach(parameter -> {
                     uriBuilder.addParameter(parameter.getKey(), parameter.getValue());
                 });
             }
@@ -105,11 +120,7 @@ public class RandomStringServiceImpl extends  CalculatorService{
         return Optional.ofNullable(uri);
     }
 
-    private HttpClient buildHttpClient(){
+    private HttpClient buildHttpClient() {
         return HttpClients.createDefault();
-        /*return HttpClient.newBuilder()
-                .version(HttpClient.Version.HTTP_2)
-                .connectTimeout(Duration.ofSeconds(10))
-                .build();*/
     }
 }

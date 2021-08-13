@@ -1,38 +1,48 @@
 package org.challenge.calculator.entity;
 
-import org.apache.commons.lang3.StringUtils;
 import org.challenge.calculator.enums.ServiceStatus;
 import org.challenge.calculator.enums.ServiceType;
 
 import javax.persistence.*;
 import java.util.UUID;
 
+/**
+ * This class represents an operation that the calculator can do.
+ */
 @Entity
 public class Service {
+    /** ID in the database*/
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    /** UUID  */
     @Column(unique=true, nullable=false)
     private String uuid;
 
+    /** Service name, eg: addition, power, log*/
     @Column(unique=true, nullable = false)
     private String name;
 
+    /** Description of what the service does*/
     @Column
     private String description;
 
+    /** Number of parameters the service needs to work*/
     @Column(columnDefinition = "numeric default 1")
     private int numParameters;
 
+    /** Defines the type or category of service */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ServiceType type;
 
+    /** Status, determines if a service can be executed or not*/
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ServiceStatus status;
 
+    /** How much it cost to use this service*/
     @Column(columnDefinition = "numeric default 0")
     private long cost;
 

@@ -1,7 +1,7 @@
 package org.challenge.calculator.controller;
 
 import org.challenge.calculator.entity.Service;
-import org.challenge.calculator.exception.ServiceNotFoundException;
+import org.challenge.calculator.exception.CalculatorException;
 import org.challenge.calculator.model.AppService;
 import org.challenge.calculator.model.AppServiceFactory;
 import org.challenge.calculator.services.ServiceCalculatorService;
@@ -30,8 +30,8 @@ public class ServicesController {
 
     @GetMapping("/list/admin")
     public Page<AppService> listServicesForAdmin(@RequestParam(defaultValue = "0") Integer pageIndex,
-                                         @RequestParam(defaultValue = "20") Integer pageSize,
-                                         @RequestParam(defaultValue = "name") String sortBy) {
+                                                 @RequestParam(defaultValue = "20") Integer pageSize,
+                                                 @RequestParam(defaultValue = "name") String sortBy) {
 
         return AppServiceFactory.buildFromPageService(calculatorServiceService.listServicesForAdmin(pageIndex,
                 pageSize, sortBy));
@@ -48,7 +48,7 @@ public class ServicesController {
 
 
     @GetMapping("/types")
-    public ResponseEntity<List<String>> serviceTypes(){
+    public ResponseEntity<List<String>> serviceTypes() {
         return new ResponseEntity<>(calculatorServiceService.getServiceTypes(), HttpStatus.OK);
     }
 
@@ -63,7 +63,7 @@ public class ServicesController {
             } else {
                 response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
-        } catch (ServiceNotFoundException | IllegalArgumentException exception) {
+        } catch (CalculatorException exception) {
             LOGGER.error(exception.getMessage());
             response = new ResponseEntity("The received information is wrong. Please verify.", HttpStatus.BAD_REQUEST);
         }
@@ -78,7 +78,7 @@ public class ServicesController {
             calculatorServiceService.deleteService(serviceUuid);
             response = new ResponseEntity(JsonUtil.buildJsonSimpleResponse("Service deleted successfully!."), HttpStatus.OK);
 
-        } catch (ServiceNotFoundException | IllegalArgumentException exception) {
+        } catch (CalculatorException exception) {
             LOGGER.error(exception.getMessage());
             response = new ResponseEntity(JsonUtil.buildJsonSimpleResponse("The received information is wrong. Please verify."),
                     HttpStatus.BAD_REQUEST);
@@ -98,7 +98,7 @@ public class ServicesController {
 
                 response = new ResponseEntity<>(newService, HttpStatus.OK);
             } catch (IllegalArgumentException exception) {
-                LOGGER.error("Something failed while creating new service.\n"+exception.getMessage());
+                LOGGER.error("Something failed while creating new service.\n" + exception.getMessage());
                 response = new ResponseEntity("The received information is wrong. Please verify.",
                         HttpStatus.BAD_REQUEST);
             }

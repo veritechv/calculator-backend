@@ -1,8 +1,8 @@
 package org.challenge.calculator.services;
 
 import org.challenge.calculator.entity.Service;
-import org.challenge.calculator.exception.CalculatorOperationException;
-import org.challenge.calculator.exception.ServiceNotFoundException;
+import org.challenge.calculator.exception.CalculatorException;
+import org.challenge.calculator.exception.ErrorCause;
 import org.challenge.calculator.model.ServiceRequest;
 import org.challenge.calculator.model.ServiceResponse;
 import org.slf4j.Logger;
@@ -53,42 +53,44 @@ public class ServiceExecutorImpl extends CalculatorService {
      *
      * @param serviceRequest Object holding the info about the service to execute, parameters and the calling  user
      * @return The result of the execution.
-     * @throws ServiceNotFoundException if the uuid passed in the request doesn't correspond to registered service
-     * @throws CalculatorOperationException if:
-     * - the service is INACTIVE
-     * - the number of parameters is not correct
-     * - the type of service is not supported yet
-     * - the request data is incomplete
+     * @throws CalculatorException if:
+     *                             - the uuid passed in the request doesn't correspond to registered service
+     *                             - the service is INACTIVE
+     *                             - the number of parameters is not correct
+     *                             - the type of service is not supported yet
+     *                             - the request data is incomplete
      */
     @Override
     public ServiceResponse execute(ServiceRequest serviceRequest) {
         ServiceResponse serviceResponse;
 
-        if(isRequestValid(serviceRequest)){
+        if (isRequestValid(serviceRequest)) {
             //check if the service we want to execute exists
             Optional<Service> existingServiceOptional =
                     serviceCalculatorService.searchServiceByUuid(serviceRequest.getServiceUuid());
 
-            if(!existingServiceOptional.isPresent()){
-                LOGGER.error("Couldn't find the service to execute with the UUID["+ serviceRequest.getServiceUuid()+"]");
-                throw new ServiceNotFoundException("Couldn't find the service with the specified data.");
+            if (!existingServiceOptional.isPresent()) {
+                LOGGER.error("Couldn't find the service to execute with the UUID[" + serviceRequest.getServiceUuid() + "]");
+                throw new CalculatorException("Couldn't find the service with the specified data.",
+                        ErrorCause.SERVICE_NOT_FOUND);
             }
             Service existingService = existingServiceOptional.get();
             //check if the service is not inactive
-            if(existingService.getStatus() ==  null && existingService.isInactive() || existingService.isDeleted()){
+            if (existingService.getStatus() == null || existingService.isInactive() || existingService.isDeleted()) {
                 LOGGER.error("We can't execute a service that is not active.");
-                throw new CalculatorOperationException("We can't execute a service that is not active.");
+                throw new CalculatorException("We can't execute a service that is not active.",
+                        ErrorCause.SERVICE_NOT_ACTIVE);
             }
 
             //check if the number of parameters received is the same as the number we expect
             int serviceRequestNumParameters = serviceRequest.getParameters() == null ? 0 : serviceRequest.getParameters().size();
-            if(serviceRequestNumParameters != existingService.getNumParameters()){
+            if (serviceRequestNumParameters != existingService.getNumParameters()) {
                 LOGGER.error("Wrong number of parameters.");
-                throw new CalculatorOperationException("Wrong number of parameters");
+                throw new CalculatorException("Wrong number of parameters", ErrorCause.WRONG_NUMBER_OF_PARAMETERS);
             }
 
             //determine which service we should execute
-            switch(existingService.getType()){
+            switch (existingService.getType()) {
                 case ADDITION:
                     serviceResponse = additionService.execute(serviceRequest);
                     break;
@@ -111,11 +113,12 @@ public class ServiceExecutorImpl extends CalculatorService {
                     serviceResponse = randomStringService.execute(serviceRequest);
                     break;
                 default:
-                    throw new CalculatorOperationException("Service type not supported ["+existingService.getType()+"]");
+                    throw new CalculatorException("Service type not supported [" + existingService.getType() + "]",
+                            ErrorCause.SERVICE_TYPE_UNSUPPORTED);
             }
 
-        }else{
-            throw new CalculatorOperationException("Invalid data to execute the service.");
+        } else {
+            throw new CalculatorException("Invalid data to execute the service.", ErrorCause.INVALID_PARAMETERS);
         }
 
         return serviceResponse;

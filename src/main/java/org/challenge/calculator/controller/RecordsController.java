@@ -2,18 +2,15 @@ package org.challenge.calculator.controller;
 
 import org.apache.commons.lang3.StringUtils;
 import org.challenge.calculator.entity.Record;
-import org.challenge.calculator.exception.RecordNotFoundException;
-import org.challenge.calculator.services.RecordService;
+import org.challenge.calculator.exception.CalculatorException;
 import org.challenge.calculator.model.AppRecord;
 import org.challenge.calculator.model.AppRecordFactory;
-import org.challenge.calculator.services.RecordServiceImpl;
+import org.challenge.calculator.services.RecordService;
 import org.challenge.calculator.utils.JsonUtil;
-import org.hibernate.annotations.GeneratorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -71,7 +68,7 @@ public class RecordsController {
                 } else {
                     response = new ResponseEntity("Update failed. Please verify data.", HttpStatus.BAD_REQUEST);
                 }
-            } catch (RecordNotFoundException | IllegalArgumentException exception) {
+            } catch (CalculatorException exception) {
                 response = new ResponseEntity(exception.getMessage(), HttpStatus.BAD_REQUEST);
             }
         } else {
@@ -93,7 +90,7 @@ public class RecordsController {
             try {
                 recordService.deleteRecord(recordUuid);
                 response = new ResponseEntity<>(JsonUtil.buildJsonSimpleResponse("Record deleted successfully!"), HttpStatus.OK);
-            } catch (RecordNotFoundException exception) {
+            } catch (CalculatorException exception) {
                 response = new ResponseEntity<>(JsonUtil.buildJsonSimpleResponse(exception.getMessage()), HttpStatus.BAD_REQUEST);
             }
 

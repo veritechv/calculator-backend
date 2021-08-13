@@ -36,23 +36,25 @@ public class UsersController {
     /**
      * Retrieves a list of users using the paging information that come
      * in the parameters.
+     *
      * @param pageIndex zero based index that indicates the page we want to retrieve
-     * @param pageSize number of elements included in each page
-     * @param sortBy field name used to sort the returne elements
+     * @param pageSize  number of elements included in each page
+     * @param sortBy    field name used to sort the returne elements
      * @return A list of users along with paging information that can be used for the next call
      */
     @GetMapping
     public Page<AppUser> listUsers(@RequestParam(defaultValue = "0") Integer pageIndex,
-                                           @RequestParam(defaultValue = "20") Integer pageSize,
-                                           @RequestParam(defaultValue = "username") String sortBy){
+                                   @RequestParam(defaultValue = "20") Integer pageSize,
+                                   @RequestParam(defaultValue = "username") String sortBy) {
         return AppUserFactory.buildFromPageUser(userService.listUsers(pageIndex, pageSize, sortBy));
     }
 
     /**
      * Retrieves the user information that corresponds to the specified username
+     *
      * @return the user information or an error if the username can't be found.
      */
-    @GetMapping(value="/{username}")
+    @GetMapping(value = "/{username}")
     public ResponseEntity<AppUser> searchUser(@PathVariable String username) {
         Optional<User> userOptional = userService.searchUser(username);
         if (!userOptional.isPresent()) {
@@ -67,21 +69,22 @@ public class UsersController {
      * This endpoint handles User updates.
      * One thing we can't update is the password. For this we should use other
      * mechanism like "Forgot my password"
+     *
      * @param appUser Object holding the information that should be updated.
      * @return The user, as ack, with the information updated.
      */
     @PutMapping
-    public ResponseEntity<AppUser> updateUser(@RequestBody AppUser appUser){
+    public ResponseEntity<AppUser> updateUser(@RequestBody AppUser appUser) {
         ResponseEntity<AppUser> response;
 
-        try{
-        User updatedUser = userService.updateUser(AppUserFactory.buildFromAppUser(appUser));
-        if(updatedUser!=null){
-            response = new ResponseEntity<>(AppUserFactory.buildFromUser(updatedUser), HttpStatus.OK);
-        }else{
-            response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        }catch (UsernameNotFoundException | IllegalArgumentException exception) {
+        try {
+            User updatedUser = userService.updateUser(AppUserFactory.buildFromAppUser(appUser));
+            if (updatedUser != null) {
+                response = new ResponseEntity<>(AppUserFactory.buildFromUser(updatedUser), HttpStatus.OK);
+            } else {
+                response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+        } catch (UsernameNotFoundException | IllegalArgumentException exception) {
             LOGGER.error(exception.getMessage());
             response = new ResponseEntity("The received information is wrong. Please verify.", HttpStatus.BAD_REQUEST);
         }
@@ -89,17 +92,17 @@ public class UsersController {
     }
 
     @DeleteMapping("/{username}")
-    public ResponseEntity<String> deleteUser(@PathVariable(name="username") String username){
+    public ResponseEntity<String> deleteUser(@PathVariable(name = "username") String username) {
         ResponseEntity<String> response;
-        if(StringUtils.isNotBlank(username)){
+        if (StringUtils.isNotBlank(username)) {
             try {
                 userService.deleteUser(username);
-                response =  new ResponseEntity<>(JsonUtil.buildJsonSimpleResponse("User deleted successfully"), HttpStatus.OK);
-            }catch(IllegalArgumentException exception){
-                response =  new ResponseEntity<>(JsonUtil.buildJsonSimpleResponse("The received information is wrong. Please verify"), HttpStatus.BAD_REQUEST);
+                response = new ResponseEntity<>(JsonUtil.buildJsonSimpleResponse("User deleted successfully"), HttpStatus.OK);
+            } catch (IllegalArgumentException exception) {
+                response = new ResponseEntity<>(JsonUtil.buildJsonSimpleResponse("The received information is wrong. Please verify"), HttpStatus.BAD_REQUEST);
             }
-        }else{
-            response =  new ResponseEntity<>(JsonUtil.buildJsonSimpleResponse("The received information is wrong. Please verify"), HttpStatus.BAD_REQUEST);
+        } else {
+            response = new ResponseEntity<>(JsonUtil.buildJsonSimpleResponse("The received information is wrong. Please verify"), HttpStatus.BAD_REQUEST);
         }
 
         return response;
@@ -109,7 +112,7 @@ public class UsersController {
      * Get the list/catalog of user roles
      */
     @GetMapping("/roles")
-    public ResponseEntity<List<String>> userRoles(){
+    public ResponseEntity<List<String>> userRoles() {
         return new ResponseEntity<>(userService.getUserRoles(), HttpStatus.OK);
     }
 
@@ -117,7 +120,7 @@ public class UsersController {
      * Get the list/catalog of user statuses
      */
     @GetMapping("/statuses")
-    public ResponseEntity<List<String>> userStatuses(){
+    public ResponseEntity<List<String>> userStatuses() {
         return new ResponseEntity<>(userService.getUserStatuses(), HttpStatus.OK);
     }
 

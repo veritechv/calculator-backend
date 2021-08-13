@@ -49,10 +49,26 @@ public class UserServiceImpl implements UserService {
         this.systemConfigurationService = systemConfigurationService;
     }
 
+    /**
+     * Gets a Use by username
+     *
+     * @param username value used to find a User
+     * @return an Optional that might be empty if the user is not found.
+     */
     public Optional<User> searchUser(String username) {
         return userRepository.findByUsername(username);
     }
 
+    /**
+     * Retrieves the list of all the users in the application.
+     * The list includes ACTIVE, TRIAL, INACTIVE and DELETED users.
+     * Method intended only for admins.
+     *
+     * @param pageIndex    Page number we want back
+     * @param pageSize     Number of users in the response list
+     * @param sortingField Name of the attribute to use for sorting
+     * @return
+     */
     public Page<User> listUsers(int pageIndex, int pageSize, String sortingField) {
         Page<User> result;
         Pageable pagingInformation = PagingInformationUtil.buildPagingInformation(pageIndex, pageSize, sortingField);
@@ -67,7 +83,13 @@ public class UserServiceImpl implements UserService {
         return result;
     }
 
-    public User saveUser(User user) {
+    /**
+     * Saves a user in the database
+     *
+     * @param user the object holding the user's data we want to create.
+     * @return the user just created.
+     */
+    public User createUser(User user) {
         return userRepository.save(user);
     }
 
@@ -77,6 +99,7 @@ public class UserServiceImpl implements UserService {
      * - has the role ROLE_USER
      * - has status  ACTIVE
      * - and has an initial balance given by the configuration "DEFAULT_BALANCE"
+     *
      * @param username username/email for the new user.
      * @param password password for the new user
      * @return the User object just created.
@@ -102,12 +125,13 @@ public class UserServiceImpl implements UserService {
         long initialBalance = systemConfigurationService.getLongConfiguration(DEFAULT_BALANCE_CONFIGURATION, 0L);
         user.setBalance(initialBalance);
 
-        return this.saveUser(user);
+        return this.createUser(user);
     }
 
     /**
      * Create a new user entry in the database.
      * We check first if a user with the given username exists so we can update it's values.
+     *
      * @param user The user object holding the new values.
      * @return The user updated.
      * @throws UsernameNotFoundException in case there is no user with the specified username.
@@ -126,10 +150,10 @@ public class UserServiceImpl implements UserService {
 
             //get roles
             Set<Role> roles = new HashSet<>();
-            for(Role role:user.getRoles()){
+            for (Role role : user.getRoles()) {
 
                 Optional<Role> roleFromDb = roleRepository.findByRoleName(role.getRoleName());
-                roleFromDb.ifPresent(r->roles.add(r));
+                roleFromDb.ifPresent(r -> roles.add(r));
             }
             existingUser.setRoles(roles);
             existingUser.setBalance(user.getBalance());
@@ -143,23 +167,24 @@ public class UserServiceImpl implements UserService {
     /**
      * This delete method does a soft delete, meaning that we are going to assign
      * a DELETE status to the user. This way we don't lose service records.
+     *
      * @param username Username/email of the user we want to delete.
      * @throws IllegalArgumentException if we pass an empty/null/invalid uuid
      */
     @Override
     public void deleteUser(String username) {
-        if(StringUtils.isNotBlank(username)){
+        if (StringUtils.isNotBlank(username)) {
             Optional<User> existingUserOptional = userRepository.findByUsername(username);
-            if(!existingUserOptional.isPresent()){
-                LOGGER.error("We couldn't find the user with username["+ username +"]");
-                throw new IllegalArgumentException("We couldn't find the user with username["+ username +"]");
+            if (!existingUserOptional.isPresent()) {
+                LOGGER.error("We couldn't find the user with username[" + username + "]");
+                throw new IllegalArgumentException("We couldn't find the user with username[" + username + "]");
             }
 
             //update the status to DELETE
             existingUserOptional.get().setStatus(UserStatus.DELETED);
             userRepository.save(existingUserOptional.get());
-            LOGGER.info("User ["+existingUserOptional.get().getUsername()+"] has been deleted");
-        }else{
+            LOGGER.info("User [" + existingUserOptional.get().getUsername() + "] has been deleted");
+        } else {
             throw new IllegalArgumentException("We need a username in order to delete the user.");
         }
     }
@@ -169,7 +194,9 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public List<String> getUserRoles() {
-        return Stream.of(RoleName.values()).map(type->{ return type.name();}).collect(Collectors.toList());
+        return Stream.of(RoleName.values()).map(type -> {
+            return type.name();
+        }).collect(Collectors.toList());
     }
 
     /**
@@ -177,6 +204,8 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public List<String> getUserStatuses() {
-        return Stream.of(UserStatus.values()).map(type->{ return type.name();}).collect(Collectors.toList());
+        return Stream.of(UserStatus.values()).map(type -> {
+            return type.name();
+        }).collect(Collectors.toList());
     }
 }

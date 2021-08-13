@@ -1,7 +1,6 @@
 package org.challenge.calculator.controller;
 
-import org.challenge.calculator.exception.CalculatorOperationException;
-import org.challenge.calculator.exception.InsufficientBalanceForExecution;
+import org.challenge.calculator.exception.CalculatorException;
 import org.challenge.calculator.model.ServiceRequest;
 import org.challenge.calculator.model.ServiceResponse;
 import org.challenge.calculator.services.CalculatorService;
@@ -20,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
  * - identify the service
  * - identify the user calling the service
  * - and the parameters needed for the execution
- *
+ * <p>
  * Notes: As a future work this controller can delegate to the service the task
  * of identify and call the appropiate service based on it's information.
  */
@@ -77,7 +76,7 @@ public class CalculatorController {
     /***** before they were replaced by  /execute           ******/
     /*************************************************************/
     @PatchMapping("/randomString")
-    public ResponseEntity<ServiceResponse> generateRandomString(@RequestBody ServiceRequest serviceRequest){
+    public ResponseEntity<ServiceResponse> generateRandomString(@RequestBody ServiceRequest serviceRequest) {
         return callService(randomStringService, serviceRequest);
     }
 
@@ -120,12 +119,9 @@ public class CalculatorController {
         try {
             ServiceResponse serviceResponse = service.execute(serviceRequest);
             responseEntity = new ResponseEntity(serviceResponse, HttpStatus.OK);
-        } catch (InsufficientBalanceForExecution exception) {
-            responseEntity = new ResponseEntity(exception.getMessage(), HttpStatus.PRECONDITION_FAILED);
-        } catch (CalculatorOperationException exception) {
+        } catch (CalculatorException exception) {
             responseEntity = new ResponseEntity(exception.getMessage(), HttpStatus.BAD_REQUEST);
         }
-
         return responseEntity;
     }
 

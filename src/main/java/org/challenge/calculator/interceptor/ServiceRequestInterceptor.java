@@ -7,7 +7,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.challenge.calculator.entity.Record;
 import org.challenge.calculator.entity.Service;
 import org.challenge.calculator.entity.User;
-import org.challenge.calculator.exception.InsufficientBalanceForExecution;
+import org.challenge.calculator.exception.CalculatorException;
+import org.challenge.calculator.exception.ErrorCause;
 import org.challenge.calculator.model.ServiceRequest;
 import org.challenge.calculator.model.ServiceResponse;
 import org.challenge.calculator.services.RecordService;
@@ -22,6 +23,9 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 import java.util.Optional;
 
+/**
+ * This interceptor is to handle common functionality among the services.
+ */
 @Aspect
 @Component
 public class ServiceRequestInterceptor {
@@ -37,6 +41,15 @@ public class ServiceRequestInterceptor {
         this.recordService = recordService;
     }
 
+    /**
+     * This pointcut is in charge of:
+     * - checking the user's balance before executing the service.
+     * - update the user's balance after the successful service execution.
+     * @param jp the method, arguments and all the information related to the service execution
+     * @return The result of the service's method call
+     * @throws Throwable if something unexpected happens.
+     * @throws CalculatorException If the user's balance is not enough.
+     */
     @Around("execution(* org.challenge.calculator.services.CalculatorService.execute*(..)) && !target(org.challenge.calculator.services.ServiceExecutorImpl)")
     public Object auditMethod(ProceedingJoinPoint jp) throws Throwable {
         String methodName = jp.getSignature().getName();
@@ -63,8 +76,8 @@ public class ServiceRequestInterceptor {
                                     ((ServiceResponse) result).getResponse());
                         }
                     } else {
-                        throw new InsufficientBalanceForExecution("Inssuficiente balance in user's account. " +
-                                "Couldn't execute [" + serviceName + "]");
+                        throw new CalculatorException("Inssuficiente balance in user's account. " +
+                                "Couldn't execute [" + serviceName + "]", ErrorCause.INSUFFICIENT_BALANCE);
                     }
                 }
             }
@@ -76,6 +89,12 @@ public class ServiceRequestInterceptor {
         return result;
     }
 
+    /**
+     * Update user's balance after service execution
+     * @param caller the user who requested the service
+     * @param service the service executed
+     * @return the balance after the deduction of the service's cost
+     */
     private long updateBalance(User caller, Service service){
         long newBalance = ServiceUsageCalculator.calculateNewBalance(caller, service);
         //update user
@@ -84,6 +103,15 @@ public class ServiceRequestInterceptor {
         return newBalance;
     }
 
+    /**
+     * Creates a new record with the information of the service execution.
+     * By default the date is now()
+     * @param caller Who requestedthe service
+     * @param service The service executed
+     * @param remainingBalance The balance after taking out the  execution's cost
+     * @param response The result of the service execution.
+     * @return The record just created.
+     */
     private Record createRecord(User caller, Service service, long remainingBalance, String response){
         Record record = new Record(service, caller, service.getCost(), remainingBalance, response, new Date());
         return recordService.createRecord(record);

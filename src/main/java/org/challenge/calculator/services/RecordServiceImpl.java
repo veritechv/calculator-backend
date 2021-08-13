@@ -3,7 +3,8 @@ package org.challenge.calculator.services;
 import org.apache.commons.lang3.StringUtils;
 import org.challenge.calculator.entity.Record;
 import org.challenge.calculator.entity.User;
-import org.challenge.calculator.exception.RecordNotFoundException;
+import org.challenge.calculator.exception.CalculatorException;
+import org.challenge.calculator.exception.ErrorCause;
 import org.challenge.calculator.repository.RecordRepository;
 import org.challenge.calculator.utils.PagingInformationUtil;
 import org.slf4j.Logger;
@@ -30,6 +31,15 @@ public class RecordServiceImpl implements RecordService {
         this.recordRepository = recordRepository;
     }
 
+    /**
+     * This method if for admin purposes because it returns the list of all the records
+     * in the application.
+     *
+     * @param pageIndex    Page number we want to retrieve
+     * @param pageSize     Number of elements expected in the page.
+     * @param sortingField Name of the field we should use to order the results.
+     * @return A set of records.
+     */
     @Override
     public Page<Record> listRecordsForAdmin(int pageIndex, int pageSize, String sortingField) {
         Page<Record> result;
@@ -44,6 +54,15 @@ public class RecordServiceImpl implements RecordService {
         return result;
     }
 
+    /**
+     * This method is for user's use. This returns only the records of a specific user.
+     *
+     * @param pageIndex    Page number we want to retrieve
+     * @param pageSize     Number of elements expected in the page.
+     * @param sortingField Name of the field we should use to order the results.
+     * @param username     the username linked to the records
+     * @return A set of records.
+     */
     @Override
     public Page<Record> listRecords(int pageIndex, int pageSize, String sortingField, String username) {
         Pageable pagingInformation = PagingInformationUtil.buildPagingInformation(pageIndex, pageSize, sortingField);
@@ -51,15 +70,21 @@ public class RecordServiceImpl implements RecordService {
         if (StringUtils.isNotBlank(username)) {
             Optional<User> caller = userService.searchUser(username);
             if (!caller.isPresent()) {
-                throw new UsernameNotFoundException("The user specified doesn't exist.");
+                throw new CalculatorException("The user specified doesn't exist.", ErrorCause.USER_NOT_FOUND);
             }
             results = recordRepository.findRecordsByUser(caller.get(), pagingInformation);
         } else {
-            throw new IllegalArgumentException("The username specified is not valid");
+            throw new CalculatorException("The username specified is not valid", ErrorCause.USER_NOT_FOUND);
         }
         return results;
     }
 
+    /**
+     * Creates a new record in the database
+     *
+     * @param newRecord object holding the data to be saved in the database
+     * @return the record just created.
+     */
     @Override
     public Record createRecord(Record newRecord) {
         return recordRepository.save(newRecord);
@@ -70,8 +95,8 @@ public class RecordServiceImpl implements RecordService {
      *
      * @param record record that we want to update
      * @return the record just updated
-     * @throws RecordNotFoundException  if we couldn't find the record using it's uuid
-     * @throws IllegalArgumentException if the record information is incomplete or invalid
+     * @throws CalculatorException if we couldn't find the record using it's uuid
+     *                             or if the record information is incomplete/ invalid.
      */
     public Record updateRecord(Record record) {
         if (record != null || StringUtils.isNoneBlank(record.getUuid(), record.getResponse())) {
@@ -79,7 +104,8 @@ public class RecordServiceImpl implements RecordService {
 
             if (!existingRecordOptional.isPresent()) {
                 LOGGER.error("We couldn't find the record with UUID [" + record.getUuid() + "]");
-                throw new RecordNotFoundException("We couldn't find the record with UUID [" + record.getUuid() + "]");
+                throw new CalculatorException("We couldn't find the record with UUID [" + record.getUuid() + "]",
+                        ErrorCause.RECORD_NOT_FOUND);
             }
             Record existingRecord = existingRecordOptional.get();
             //update only cost, balance and response
@@ -100,18 +126,20 @@ public class RecordServiceImpl implements RecordService {
 
     /**
      * Deletes a Record from the database
+     *
      * @param recordUuid UUID of the record we want to delete
      */
     @Override
     public void deleteRecord(String recordUuid) {
-        if(StringUtils.isNotBlank(recordUuid)){
+        if (StringUtils.isNotBlank(recordUuid)) {
             Optional<Record> existingRecordOptional = recordRepository.findRecordByUuid(recordUuid);
             if (!existingRecordOptional.isPresent()) {
                 LOGGER.error("We couldn't find the record with UUID [" + recordUuid + "]");
-                throw new RecordNotFoundException("We couldn't find the record with UUID [" + recordUuid + "]");
+                throw new CalculatorException("We couldn't find the record with UUID [" + recordUuid + "]",
+                        ErrorCause.RECORD_NOT_FOUND);
             }
             recordRepository.delete(existingRecordOptional.get());
-            LOGGER.info("Record with UUID["+recordUuid+"] deleted successfully!");
+            LOGGER.info("Record with UUID[" + recordUuid + "] deleted successfully!");
         }
     }
 }
