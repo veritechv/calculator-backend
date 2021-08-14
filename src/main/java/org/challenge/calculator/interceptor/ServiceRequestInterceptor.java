@@ -7,6 +7,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.challenge.calculator.entity.Record;
 import org.challenge.calculator.entity.Service;
 import org.challenge.calculator.entity.User;
+import org.challenge.calculator.enums.RecordStatus;
 import org.challenge.calculator.exception.CalculatorException;
 import org.challenge.calculator.exception.ErrorCause;
 import org.challenge.calculator.model.ServiceRequest;
@@ -83,7 +84,7 @@ public class ServiceRequestInterceptor {
             }
 
         } else {
-            throw new IllegalArgumentException("Service request not valid.");
+            throw new CalculatorException("Service request not valid.", ErrorCause.INVALID_PARAMETERS);
         }
         LOGGER.info("returning result");
         return result;
@@ -113,7 +114,8 @@ public class ServiceRequestInterceptor {
      * @return The record just created.
      */
     private Record createRecord(User caller, Service service, long remainingBalance, String response){
-        Record record = new Record(service, caller, service.getCost(), remainingBalance, response, new Date());
+        Record record = new Record(service, caller, service.getCost(), remainingBalance, response, new Date(),
+                RecordStatus.ACTIVE);
         return recordService.createRecord(record);
     }
 

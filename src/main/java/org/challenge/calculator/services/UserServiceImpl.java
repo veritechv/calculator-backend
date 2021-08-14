@@ -5,6 +5,8 @@ import org.challenge.calculator.entity.Role;
 import org.challenge.calculator.entity.User;
 import org.challenge.calculator.enums.RoleName;
 import org.challenge.calculator.enums.UserStatus;
+import org.challenge.calculator.exception.CalculatorException;
+import org.challenge.calculator.exception.ErrorCause;
 import org.challenge.calculator.repository.RoleRepository;
 import org.challenge.calculator.repository.UserRepository;
 import org.challenge.calculator.utils.PagingInformationUtil;
@@ -14,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mapping.PropertyReferenceException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -76,8 +77,9 @@ public class UserServiceImpl implements UserService {
         try {
             result = userRepository.findAll(pagingInformation);
         } catch (PropertyReferenceException exception) {
-            LOGGER.info("The paging information is wrong. Please verify. Returning empty results");
-            result = Page.empty();
+            LOGGER.info("The paging information is wrong. Please verify.");
+            throw new CalculatorException("The paging information is wrong. Please verify.",
+                    ErrorCause.INVALID_PARAMETERS);
         }
 
         return result;
@@ -134,14 +136,15 @@ public class UserServiceImpl implements UserService {
      *
      * @param user The user object holding the new values.
      * @return The user updated.
-     * @throws UsernameNotFoundException in case there is no user with the specified username.
+     * @throws CalculatorException in case there is no user with the specified username.
      */
     public User updateUser(User user) {
         if (user != null) {
             Optional<User> existingUserOptional = userRepository.findByUsername(user.getUsername());
             if (!existingUserOptional.isPresent()) {
                 LOGGER.error("we couldn't find the user[" + user.getUsername() + "] for update.");
-                throw new UsernameNotFoundException("The user [" + user.getUsername() + "] was not found.");
+                throw new CalculatorException("The user [" + user.getUsername() + "] was not found.",
+                        ErrorCause.USER_NOT_FOUND);
             }
 
             User existingUser = existingUserOptional.get();
@@ -177,7 +180,8 @@ public class UserServiceImpl implements UserService {
             Optional<User> existingUserOptional = userRepository.findByUsername(username);
             if (!existingUserOptional.isPresent()) {
                 LOGGER.error("We couldn't find the user with username[" + username + "]");
-                throw new IllegalArgumentException("We couldn't find the user with username[" + username + "]");
+                throw new CalculatorException("We couldn't find the user with username[" + username + "]",
+                        ErrorCause.USER_NOT_FOUND);
             }
 
             //update the status to DELETE
@@ -185,7 +189,7 @@ public class UserServiceImpl implements UserService {
             userRepository.save(existingUserOptional.get());
             LOGGER.info("User [" + existingUserOptional.get().getUsername() + "] has been deleted");
         } else {
-            throw new IllegalArgumentException("We need a username in order to delete the user.");
+            throw new CalculatorException("We need a username in order to delete it.", ErrorCause.INVALID_PARAMETERS);
         }
     }
 

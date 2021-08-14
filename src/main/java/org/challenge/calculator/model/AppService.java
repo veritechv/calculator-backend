@@ -1,12 +1,28 @@
 package org.challenge.calculator.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "Represents an operation that the calculator can do.")
 public class AppService {
+    @Schema(description = "Service's uuid")
     private String uuid;
+
+    @Schema(description = "Service's uuid")
     private String name;
+
+    @Schema(description = "What the service does")
     private String description;
+
+    @Schema(description = "Service's status, eg: ACTIVE")
     private String status;
+
+    @Schema(description = "Service's type, eg: ADDITION")
     private String type;
+
+    @Schema(description = "Number of parameters the service needs to work")
     private int numParameters;
+
+    @Schema(description = "How much it cost to use this service")
     private long cost;
 
     public AppService(String uuid, String name, String description, String status, String type, int numParameters, long cost) {

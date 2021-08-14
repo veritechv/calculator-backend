@@ -1,6 +1,7 @@
 package org.challenge.calculator.model;
 
 import org.challenge.calculator.entity.Record;
+import org.challenge.calculator.enums.RecordStatus;
 import org.springframework.data.domain.Page;
 
 /**
@@ -20,10 +21,11 @@ public class AppRecordFactory {
             String serviceType = record.getService() != null ? record.getService().getType().name() : null;
             String serviceName = record.getService() != null ? record.getService().getName() :  null;
             String caller = record.getUser() != null ? record.getUser().getUsername() : null;
+            String status = record.getStatus() != null ? record.getStatus().name() : null;
             long executionDate = record.getDate() != null ? record.getDate().getTime() : 0L;
 
             appRecord = new AppRecord(record.getUuid(), serviceName, serviceType, caller, record.getCost(),
-                    record.getBalance(), record.getResponse(), executionDate);
+                    record.getBalance(), record.getResponse(), executionDate, status);
         }
 
         return appRecord;
@@ -41,6 +43,9 @@ public class AppRecordFactory {
             record.setCost(appRecord.getCost());
             record.setBalance(appRecord.getBalance());
             record.setResponse(appRecord.getResponse());
+            if(appRecord.getStatus()!=null) {
+                record.setStatus(RecordStatus.valueOf(appRecord.getStatus()));
+            }
         }
 
         return record;

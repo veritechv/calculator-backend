@@ -1,5 +1,8 @@
 package org.challenge.calculator.entity;
 
+import org.challenge.calculator.enums.RecordStatus;
+import org.challenge.calculator.enums.UserStatus;
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.UUID;
@@ -46,18 +49,24 @@ public class Record {
     @Column(nullable = false)
     private Date date;
 
+    /** Status of the record, eg: ACTIVE */
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private RecordStatus status;
+
     public Record() {
         uuid = UUID.randomUUID().toString();
     }
 
-    public Record(Service serviceExecuted, User caller, long executionCost, long remainingBalance, String serviceResponse, Date executionDate) {
+    public Record(Service service, User user, long cost, long balance, String response, Date date, RecordStatus status) {
         this();
-        this.service = serviceExecuted;
-        this.user = caller;
-        this.cost = executionCost;
-        this.balance = remainingBalance;
-        this.response = serviceResponse;
-        this.date = executionDate;
+        this.service = service;
+        this.user = user;
+        this.cost = cost;
+        this.balance = balance;
+        this.response = response;
+        this.date = date;
+        this.status = status;
     }
 
     public long getId() {
@@ -122,5 +131,13 @@ public class Record {
 
     public void setDate(Date executionDate) {
         this.date = executionDate;
+    }
+
+    public RecordStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(RecordStatus status) {
+        this.status = status;
     }
 }

@@ -86,10 +86,10 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http.cors().configurationSource(corsConfigurationSource()).and()//this is linked to the hack above
-                //.addFilterBefore(corsFilter(), SessionManagementFilter.class)
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/v*/login/**", "/v*/signup/**").permitAll()
+                .antMatchers("/api/v*/login/**", "api/v*/signup/**", //allow register and login without jwt
+                        "/calculator/api-docs/**","/swagger-ui/**", "/swagger-ui**").permitAll() // the same for docs
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling().authenticationEntryPoint(jwtEntryPoint)

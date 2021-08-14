@@ -1,13 +1,18 @@
 package org.challenge.calculator.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.apache.commons.lang3.StringUtils;
 import org.challenge.calculator.entity.User;
 import org.challenge.calculator.model.AppUser;
 import org.challenge.calculator.model.AppUserFactory;
 import org.challenge.calculator.services.UserService;
 import org.challenge.calculator.utils.JsonUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -20,11 +25,11 @@ import java.util.Optional;
 /**
  * Controller in charge of CRUD operations for User objects
  */
+@SecurityRequirement(name = "calculatorapi")
 @RestController
-@RequestMapping("/v1/users")
+@RequestMapping("/api/v1/users")
 @CrossOrigin
 public class UsersController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(UsersController.class);
     private UserService userService;
 
     @Autowired
@@ -32,60 +37,69 @@ public class UsersController {
         this.userService = userService;
     }
 
-    /**
-     * Retrieves a list of users using the paging information that come
-     * in the parameters.
-     *
-     * @param pageIndex zero based index that indicates the page we want to retrieve
-     * @param pageSize  number of elements included in each page
-     * @param sortBy    field name used to sort the returne elements
-     * @return A list of users along with paging information that can be used for the next call
-     */
+    @Operation(summary = "Gets the list of all users registered in the application")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns a paginated view of all the users found",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Page.class))}),
+            @ApiResponse(responseCode = "400", description = "If the pagination parameters are wrong",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = String.class))})})
     @GetMapping
-    public Page<AppUser> listUsers(@RequestParam(defaultValue = "0") Integer pageIndex,
+    public Page<AppUser> listUsers(@Parameter(description = "Zero based index that indicates the page we want to retrieve")
+                                   @RequestParam(defaultValue = "0") Integer pageIndex,
+                                   @Parameter(description = "Number of records per page. Default is 20.")
                                    @RequestParam(defaultValue = "20") Integer pageSize,
+                                   @Parameter(description = "Field name used to sort the returned elements. Default is username")
                                    @RequestParam(defaultValue = "username") String sortBy) {
         return AppUserFactory.buildFromPageUser(userService.listUsers(pageIndex, pageSize, sortBy));
     }
 
-    /**
-     * Retrieves the user information that corresponds to the specified username
-     *
-     * @return the user information or an error if the username can't be found.
-     */
+    @Operation(summary = "Retrieves the user information that corresponds to the specified username")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns the found user",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = AppUser.class))}),
+            @ApiResponse(responseCode = "404", description = "If the user wasn't found",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = String.class))})})
     @GetMapping(value = "/{username}")
     public ResponseEntity<AppUser> searchUser(@PathVariable String username) {
         Optional<User> userOptional = userService.searchUser(username);
-        if (!userOptional.isPresent()) {
-            LOGGER.info("User [" + username + "] NOT FOUND");
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else {
+        if (userOptional.isPresent()) {
             return new ResponseEntity<>(AppUserFactory.buildFromUser(userOptional.get()), HttpStatus.OK);
+        } else {
+            return new ResponseEntity(JsonUtil.buildJsonSimpleResponse("The user couldn't be found."),
+                    HttpStatus.NOT_FOUND);
         }
     }
 
-    /**
-     * This endpoint handles User updates.
-     * One thing we can't update is the password. For this we should use other
-     * mechanism like "Forgot my password"
-     *
-     * @param appUser Object holding the information that should be updated.
-     * @return The user, as ack, with the information updated.
-     */
+    @Operation(summary = "Updates a user's data")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns the user with the new data.",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = AppUser.class))}),
+            @ApiResponse(responseCode = "404", description = "If the user we want to update doesn't exist",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = String.class))})})
     @PutMapping
     public ResponseEntity<AppUser> updateUser(@RequestBody AppUser appUser) {
-        ResponseEntity<AppUser> response;
-
         User updatedUser = userService.updateUser(AppUserFactory.buildFromAppUser(appUser));
-        if (updatedUser != null) {
-            response = new ResponseEntity<>(AppUserFactory.buildFromUser(updatedUser), HttpStatus.OK);
-        } else {
-            response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        return response;
+        return new  ResponseEntity<>(AppUserFactory.buildFromUser(updatedUser), HttpStatus.OK);
     }
 
+
+    @Operation(summary = "Deletes an specific user identified by it's username")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returs an ACK message for the deletion",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = String.class))}),
+            @ApiResponse(responseCode = "404", description = "If the user we want to delete doesn't exist",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = String.class))}),
+            @ApiResponse(responseCode = "400", description = "If the username is not valid",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = String.class))})})
     @DeleteMapping("/{username}")
     public ResponseEntity<String> deleteUser(@PathVariable(name = "username") String username) {
         ResponseEntity<String> response;
@@ -98,9 +112,11 @@ public class UsersController {
         return response;
     }
 
-    /**
-     * Get the list/catalog of user roles
-     */
+    @Operation(summary = "Gets the list of all the different user roles")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "The list of roles",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = List.class))})})
     @GetMapping("/roles")
     public ResponseEntity<List<String>> userRoles() {
         return new ResponseEntity<>(userService.getUserRoles(), HttpStatus.OK);
@@ -109,6 +125,11 @@ public class UsersController {
     /**
      * Get the list/catalog of user statuses
      */
+    @Operation(summary = "Gets the list of all the different status a user could have")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "The list of statuses",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = List.class))})})
     @GetMapping("/statuses")
     public ResponseEntity<List<String>> userStatuses() {
         return new ResponseEntity<>(userService.getUserStatuses(), HttpStatus.OK);

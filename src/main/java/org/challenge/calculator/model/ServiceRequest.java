@@ -1,10 +1,18 @@
 package org.challenge.calculator.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.List;
 
 public class ServiceRequest {
+
+    @Schema(description = "Service's uuid we want to execute", required = true)
     private String serviceUuid;
+
+    @Schema(description = "User's username asking requesting the service", required = true)
     private String username;
+
+    @Schema(description = "List of input parameters given by the user" )
     private List<String> parameters;
 
     public ServiceRequest(String serviceUUID, String username, List<String> parameters) {

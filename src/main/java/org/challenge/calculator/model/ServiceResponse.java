@@ -1,11 +1,25 @@
 package org.challenge.calculator.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 public class ServiceResponse {
+
+    @Schema(description = "Service's uuid that was executed")
     private String serviceUUID;
+
+    @Schema(description = "User's username that requested the service")
     private String username;
+
+    @Schema(description = "Input parameters used by the service")
     private String usedParameters;
+
+    @Schema(description = "Result of the execution")
     private String response;
+
+    @Schema(description = "User's balance after the service execution")
     private long remainingBalance;
+
+    @Schema(description = "Date and time of the service execution in millis")
     private long executionDate;
 
     public ServiceResponse(String serviceUUID, String username, String usedParameters, String response, long remainingBalance, long executionDate) {

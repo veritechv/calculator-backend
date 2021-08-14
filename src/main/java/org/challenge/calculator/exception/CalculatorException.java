@@ -17,4 +17,8 @@ public class CalculatorException extends RuntimeException{
         super(message);
         this. cause = cause;
     }
+
+    public ErrorCause getErrorCause() {
+        return cause;
+    }
 }

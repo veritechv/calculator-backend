@@ -1,18 +1,40 @@
 package org.challenge.calculator.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description="Represents the service execution done by a user.\n" +
+        "Every time a user executes a service a new Record is saved by application.")
 public class AppRecord {
+    @Schema(description = "Record's uuid")
     private String uuid;
+
+    @Schema(description = "Name of the service executed")
     private String serviceName;
+
+    @Schema(description = "Type of service executed")
     private String serviceType;
+
+    @Schema(description = "User's username that requested the service")
     private String username;
+
+    @Schema(description = "Service execution cost")
     private long cost;
+
+    @Schema(description = "User's balance after the service execution")
     private long balance;
+
+    @Schema(description = "Service's execution result")
     private String response;
+
+    @Schema(description = "Timestamp of the execution")
     private long date;
+
+    @Schema(description="Record's status, usually is ACTIVE")
+    private String status;
 
     public AppRecord(String uuid, String serviceName, String serviceType,
                      String userName, long executionCost, long remainingBalance,
-                     String response, long executionDate) {
+                     String response, long executionDate, String status) {
         this.uuid = uuid;
         this.serviceName = serviceName;
         this.serviceType = serviceType;
@@ -21,6 +43,7 @@ public class AppRecord {
         this.balance = remainingBalance;
         this.response = response;
         this.date = executionDate;
+        this.status = status;
     }
 
     public String getUuid() {
@@ -85,5 +108,13 @@ public class AppRecord {
 
     public void setServiceType(String serviceType) {
         this.serviceType = serviceType;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

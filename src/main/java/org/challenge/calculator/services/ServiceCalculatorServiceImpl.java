@@ -91,8 +91,9 @@ public class ServiceCalculatorServiceImpl implements ServiceCalculatorService {
             }
             result = serviceRepository.findAllByStatusIn(requiredStatus, pagingInformation);
         } catch (PropertyReferenceException exception) {
-            LOGGER.info("The paging information is wrong. Please verify. Returning empty results");
-            result = Page.empty();
+            LOGGER.info("The paging information is wrong. Please verify.");
+            throw new CalculatorException("The paging information is wrong. Please verify.",
+                    ErrorCause.INVALID_PARAMETERS);
         }
 
         return result;

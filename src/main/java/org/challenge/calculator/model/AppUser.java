@@ -1,12 +1,24 @@
 package org.challenge.calculator.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.List;
 
+@Schema(description = "Represents the user of the calculator. Could it be an admin or a regular user.")
 public class AppUser {
+    @Schema(description = "User's uuid")
     private String uuid;
+
+    @Schema(description = "User's username, eg:email address")
     private String username;
+
+    @Schema(description = "User's list of roles, eg: SUPPORT")
     private List<String> roles;
+
+    @Schema(description = "User's credits/points/chips she can spend on services")
     private long balance;
+
+    @Schema(description = "User's status, eg: ACTIVE")
     private String status;
 
     public AppUser(String uuid, String username, List<String> roles, long balance, String status) {

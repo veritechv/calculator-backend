@@ -3,6 +3,7 @@ package org.challenge.calculator.services;
 import org.apache.commons.lang3.StringUtils;
 import org.challenge.calculator.entity.Record;
 import org.challenge.calculator.entity.User;
+import org.challenge.calculator.enums.RecordStatus;
 import org.challenge.calculator.exception.CalculatorException;
 import org.challenge.calculator.exception.ErrorCause;
 import org.challenge.calculator.repository.RecordRepository;
@@ -13,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mapping.PropertyReferenceException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -46,10 +46,10 @@ public class RecordServiceImpl implements RecordService {
         Pageable pagingInformation = PagingInformationUtil.buildPagingInformation(pageIndex, pageSize, sortingField);
         try {
             result = recordRepository.findAll(pagingInformation);
-        } catch (
-                PropertyReferenceException exception) {
-            LOGGER.info("The paging information is wrong. Please verify. Returning empty results");
-            result = Page.empty();
+        } catch (PropertyReferenceException exception) {
+            LOGGER.info("The paging information is wrong. Please verify.");
+            throw new CalculatorException("The paging information is wrong. Please verify.",
+                    ErrorCause.INVALID_PARAMETERS);
         }
         return result;
     }
@@ -72,7 +72,13 @@ public class RecordServiceImpl implements RecordService {
             if (!caller.isPresent()) {
                 throw new CalculatorException("The user specified doesn't exist.", ErrorCause.USER_NOT_FOUND);
             }
-            results = recordRepository.findRecordsByUser(caller.get(), pagingInformation);
+            try {
+                results = recordRepository.findRecordsByUser(caller.get(), pagingInformation);
+            } catch (PropertyReferenceException exception) {
+                LOGGER.info("The paging information is wrong. Please verify.");
+                throw new CalculatorException("The paging information is wrong. Please verify.",
+                        ErrorCause.INVALID_PARAMETERS);
+            }
         } else {
             throw new CalculatorException("The username specified is not valid", ErrorCause.USER_NOT_FOUND);
         }
@@ -99,7 +105,8 @@ public class RecordServiceImpl implements RecordService {
      *                             or if the record information is incomplete/ invalid.
      */
     public Record updateRecord(Record record) {
-        if (record != null || StringUtils.isNoneBlank(record.getUuid(), record.getResponse())) {
+        if (record != null && record.getStatus()!= null &&
+                StringUtils.isNoneBlank(record.getUuid(), record.getResponse())) {
             Optional<Record> existingRecordOptional = recordRepository.findRecordByUuid(record.getUuid());
 
             if (!existingRecordOptional.isPresent()) {
@@ -112,13 +119,14 @@ public class RecordServiceImpl implements RecordService {
             existingRecord.setBalance(record.getBalance());
             existingRecord.setCost(record.getCost());
             existingRecord.setResponse(record.getResponse());
+            existingRecord.setStatus(record.getStatus());
 
             recordRepository.save(existingRecord);
             record = existingRecord;
 
         } else {
             LOGGER.error("Insufficient information to delete record.");
-            throw new IllegalArgumentException("Insufficient information to delete record.");
+            throw new CalculatorException("Insufficient information to delete record.", ErrorCause.INVALID_PARAMETERS);
         }
 
         return record;
@@ -138,7 +146,9 @@ public class RecordServiceImpl implements RecordService {
                 throw new CalculatorException("We couldn't find the record with UUID [" + recordUuid + "]",
                         ErrorCause.RECORD_NOT_FOUND);
             }
-            recordRepository.delete(existingRecordOptional.get());
+            Record existingRecord = existingRecordOptional.get();
+            existingRecord.setStatus(RecordStatus.DELETED);
+            recordRepository.save(existingRecord);
             LOGGER.info("Record with UUID[" + recordUuid + "] deleted successfully!");
         }
     }
