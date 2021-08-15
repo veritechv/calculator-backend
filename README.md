@@ -1,4 +1,5 @@
 **Introduction**
+
 Welcome to the backend piece for the Web Calculator project.
 
 This is a Java project that offers a REST API that let us use a set of services, or
@@ -12,6 +13,7 @@ Among other things we can:
 
 ----
 **Requirements**
+
 In order to run this projec we need:
 - Java 1.8+
 - Postgres 9.4+
@@ -20,6 +22,7 @@ In order to run this projec we need:
 
 ----
 **Project Structure**
+
 This is how the code structure looks:
 ```
 .
@@ -31,22 +34,22 @@ This is how the code structure looks:
     │         │         └── org
     │         │             └── challenge
     │         │                 └── calculator
-    │         │                     ├── controller
+    │         │                     ├── controller    <-- REST endpoints
     │         │                     │         └── exception
-    │         │                     ├── entity
-    │         │                     ├── enums
-    │         │                     ├── exception
-    │         │                     ├── interceptor
-    │         │                     ├── model
-    │         │                     ├── repository
-    │         │                     ├── security
+    │         │                     ├── entity        <-- Entities mapped to DB
+    │         │                     ├── enums         <-- Statuses and error codes
+    │         │                     ├── exception  
+    │         │                     ├── interceptor   <-- Checks and updates user's balance 
+    │         │                     ├── model         <-- DTOs
+    │         │                     ├── repository    <-- Database access
+    │         │                     ├── security      <-- Spring Security related classes
     │         │                     │         ├── jwt
     │         │                     │         └── utils
-    │         │                     ├── services
+    │         │                     ├── services      <-- Services definitions and implementations
     │         │                     └── utils
     │         └── resources
     │             ├── db
-    │             │         └── migration
+    │             │         └── migration             <-- Migration files
     │             ├── static
     │             └── templates
     └── test
@@ -57,7 +60,8 @@ This is how the code structure looks:
                         └── services
 ```
 ----
-**Model**
+**Entities**
+
 To support the functionality of the application we use the following entities:
 - User. The person using the application, usually executing the services.
 - Role. Type of user. It helps us to determine the functionality a user can use.
@@ -88,6 +92,7 @@ It could be used to store other information like URLs or credentials to connect 
 
 ----
 **Migrations**
+
 The migrations mechanism is supported by [FlywayDB](https://flywaydb.org/documentation/v6/).
 I choose the version 6 because it's the one supporting PostgreSQL 9.4, the one I'm using.
 
@@ -111,6 +116,7 @@ We can run the migrations before starting the application executing this command
 
 -------
 **Services**
+
 Initially we have seven services;
 1. Addition
 2. Subtraction
@@ -132,6 +138,7 @@ The execute method receives a `ServiceRequest` object that let us know which ser
 The execution result is encapsulated in a `ServiceResponse` object, which holds information regarding to the actual result of the math operation, date, parameters used, and user's balance after the execution.
 
 **REST API**
+
 The api is exposed by five controllers:
 - Login
 - Users
@@ -154,6 +161,7 @@ service, but after some iterations I decided to use a strategy pattern to determ
 I left the original endpoints so we can see how this approach reduced the boilerplate code, and also for testing purposes.
 
 _Security_
+
 To let only registered users use the API the application asks for a token in every request, except for the login and the sign up endpoints.
 
 The token was generated using a JSON Web Token library (`io.jsonwebtoken`).
@@ -185,11 +193,13 @@ All the security related classes are in the package `org.challenge.calculator.se
 
 
 _API Docs_
+
 The api documentation was done using a java library for [Open Api 3](https://swagger.io/specification/).
 After the application has started you can visit
 this address `http://localhost:8081/swagger-ui/index.html?configUrl=/calculator/api-docs/swagger-config` to give it a try.
 
 _API versioning_
+
 For this purpose I take a simple approach about appending the version in url as prefix, so the endpoints look something like this:
 `http://localhost:8081/api/v1/login/authenticate`
 
@@ -197,6 +207,7 @@ So every time we change version we need to update the prefix.
 
 ----
 **Installation**
+
 For local development we need installed:
 - PostgreSQL 9.4
 - Java 1.8
@@ -216,6 +227,7 @@ to startup the application.
 Once it started the rest endpoints are ready to be used.
 
 _Important_
+
 As part of the  migrations there is a initialization script that adds a user with
 ADMIN privileges, the credentials are:
 - user: admin@test.com
@@ -224,6 +236,7 @@ ADMIN privileges, the credentials are:
 
 ----
 **Docker**
+
 If we don't want to install/setup a development environment we can use Docker to let us test the API.
 
 But first you need to install [Docker](https://www.docker.com/products/docker-desktop).
@@ -234,6 +247,7 @@ and after everything has started you can start testing the API as explained in t
 
 ----
 **Future work**
+
 - Make tests for all the services and controllers. (BIG FAIL)
 - Include the roles in the security configuration to limit access to the api.
 - Find a way to document Page, Pageable and Sort classes.
