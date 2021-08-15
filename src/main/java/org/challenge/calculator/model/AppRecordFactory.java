@@ -40,6 +40,7 @@ public class AppRecordFactory {
         Record record = null;
         if(appRecord!=null){
             record = new Record();
+            record.setUuid(appRecord.getUuid());
             record.setCost(appRecord.getCost());
             record.setBalance(appRecord.getBalance());
             record.setResponse(appRecord.getResponse());

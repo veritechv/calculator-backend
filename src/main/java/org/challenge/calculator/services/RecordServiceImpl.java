@@ -43,6 +43,12 @@ public class RecordServiceImpl implements RecordService {
     @Override
     public Page<Record> listRecordsForAdmin(int pageIndex, int pageSize, String sortingField) {
         Page<Record> result;
+
+        if(StringUtils.equalsIgnoreCase(sortingField, "username")){
+            //change the sorting field to
+            sortingField = "user";
+        }
+
         Pageable pagingInformation = PagingInformationUtil.buildPagingInformation(pageIndex, pageSize, sortingField);
         try {
             result = recordRepository.findAll(pagingInformation);

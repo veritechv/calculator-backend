@@ -116,7 +116,10 @@ public class ServiceCalculatorServiceImpl implements ServiceCalculatorService {
                         ErrorCause.SERVICE_NOT_FOUND);
             }
             existingService = optionalExistingService.get();
-            //updating cost and status only
+            existingService.setName(service.getName());
+            existingService.setDescription(service.getDescription());
+            existingService.setType(service.getType());
+            existingService.setStatus(service.getStatus());
             existingService.setStatus(service.getStatus());
             existingService.setCost(service.getCost());
 
@@ -147,7 +150,8 @@ public class ServiceCalculatorServiceImpl implements ServiceCalculatorService {
 
             Service existingService = optionalExistingService.get();
             //delete the service
-            serviceRepository.delete(existingService);
+            existingService.setStatus(ServiceStatus.DELETED);
+            serviceRepository.save(existingService);
         } else {
             throw new CalculatorException("Service information is incorrect. Please check.",
                     ErrorCause.INVALID_PARAMETERS);
